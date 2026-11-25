@@ -1,14 +1,14 @@
 import { PageHeader } from "@/components/portal/page-header";
-import { DataPanel } from "@/components/portal/data-panel";
 import { UnlockRequestsPanel } from "@/components/limbo/unlock-requests-panel";
+import { ReviewDeskPackets } from "@/components/admin/coord-pages";
 
 export default function ReviewDesk() {
   return (
     <>
       <PageHeader section="Coordinator" title="Review Desk" />
-      <div className="grid gap-5">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
         <UnlockRequestsPanel />
-        <DataPanel title="Submitted Packets" columns={["PO", "FTO", "Phase · Week", "Packet", "Submitted", "Status"]} empty="No submitted packets" />
+        <ReviewDeskPackets />
       </div>
     </>
   );
