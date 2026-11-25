@@ -5,19 +5,19 @@ export function weekClass(x: Week) {
   if (x.kind === "future") return "wk fut";
   if (x.kind === "limbo") return "wk lim";
   if (x.nrt > 0) return "wk nrt";
-  return `wk u${Math.min(x.uaDays, 3)}${x.lim > 0 ? " haslim" : ""}`;
+  return `wk u${x.UA === 0 ? 0 : x.UA <= 2 ? 1 : x.UA <= 5 ? 2 : 3}${x.lim > 0 ? " haslim" : ""}`;
 }
 
 export function weekTitle(x: Week) {
   if (x.kind === "future") return `Week ${x.w} · not yet worked`;
   if (x.kind === "limbo") return `Week ${x.w} · limbo`;
-  return `Week ${x.w} · UA days ${x.uaDays}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${x.late ? " · late packet" : ""}`;
+  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UAs"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${x.late ? " · late packet" : ""}`;
 }
 
 export function WeekCell({ x, showNum }: { x: Week; showNum?: boolean }) {
   return (
     <span className={weekClass(x)} title={weekTitle(x)}>
-      {x.kind === "limbo" ? "L" : showNum && x.kind === "rated" ? x.uaDays : ""}
+      {x.kind === "limbo" ? "L" : showNum && x.kind === "rated" ? x.UA : ""}
     </span>
   );
 }
@@ -42,7 +42,7 @@ export function WeekStrip({ po, big }: { po: ProgressPO; big?: boolean }) {
 function tileClass(s: PhaseStats | null) {
   if (!s) return "tile fut";
   if (s.nrt > 0) return "tile nrt";
-  return `tile ${s.uaDays <= 2 ? "t0" : s.uaDays <= 5 ? "t1" : s.uaDays <= 9 ? "t2" : "t3"}`;
+  return `tile ${s.UA <= 2 ? "t0" : s.UA <= 5 ? "t1" : s.UA <= 9 ? "t2" : "t3"}`;
 }
 
 export function PhaseTiles({ po }: { po: ProgressPO }) {
@@ -51,7 +51,7 @@ export function PhaseTiles({ po }: { po: ProgressPO }) {
       {po.phases.map((s, i) => (
         <div key={i} className={tileClass(s)}>
           <span>{PHASE_LABEL[i]}</span>
-          <b>{s ? s.uaDays : "–"}</b>
+          <b>{s ? s.UA : "–"}</b>
           <i>{s ? pct(s.aPct) : ""}</i>
         </div>
       ))}
@@ -87,10 +87,10 @@ export function TrendLabel({ po }: { po: ProgressPO }) {
 
 export function Legend() {
   const items: [string, string][] = [
-    ["lw u0", "0 UA days"],
-    ["lw u1", "1"],
-    ["lw u2", "2"],
-    ["lw u3", "3+"],
+    ["lw u0", "0 UAs"],
+    ["lw u1", "1-2"],
+    ["lw u2", "3-5"],
+    ["lw u3", "6+"],
     ["lw nrt", "NRT"],
     ["lw lim", "Limbo week"],
     ["lw u0 haslim", "Week with limbo days"],

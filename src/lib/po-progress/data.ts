@@ -16,7 +16,6 @@ export type Week =
       RT: number;
       NO: number;
       nrt: number;
-      uaDays: number;
       uaByCat: Record<number, number>;
       late: boolean;
     };
@@ -27,7 +26,6 @@ export type PhaseStats = {
   RT: number;
   NO: number;
   nrt: number;
-  uaDays: number;
   late: number;
   rated: number;
   uaPct: number;
@@ -102,16 +100,14 @@ function build() {
           else A++;
         }
       phaseUA[ph] = phaseUA[ph] || {};
-      const uaDays: Record<number, number> = {};
-      for (const c in uaByCat) uaDays[c] = Math.min(uaByCat[c], rated);
-      for (const c in uaDays) {
+      for (const c in uaByCat) {
         const before = phaseUA[ph][c] || 0;
-        phaseUA[ph][c] = before + uaDays[c];
-        if (before < 3 && before + uaDays[c] >= 3 && prof !== "strong") { nrt++; nrtCats.add(+c); }
+        phaseUA[ph][c] = before + uaByCat[c];
+        if (before < 3 && before + uaByCat[c] >= 3 && prof !== "strong") { nrt++; nrtCats.add(+c); }
       }
       const late = rnd() < 0.04;
       if (prof === "struggling" && ((k === 3 && w === 14) || (k === 29 && w === 13))) nrt++;
-      weeks.push({ w, kind: "rated", ph, lim, rated, A, UA, RT, NO, nrt, uaDays: Object.values(uaDays).reduce((a, b) => a + b, 0), uaByCat: uaDays, late });
+      weeks.push({ w, kind: "rated", ph, lim, rated, A, UA, RT, NO, nrt, uaByCat, late });
     }
     return { ...p, k, weeks, phaseUA, nrtCats: [...nrtCats] };
   });
@@ -119,10 +115,10 @@ function build() {
   const stats = (po: (typeof raw)[number], ph: number): PhaseStats | null => {
     const ws = po.weeks.filter((x): x is Extract<Week, { kind: "rated" }> => x.kind === "rated" && x.ph === ph);
     if (!ws.length) return null;
-    const s = { A: 0, UA: 0, RT: 0, NO: 0, nrt: 0, uaDays: 0, late: 0, rated: 0 };
-    ws.forEach((x) => { s.A += x.A; s.UA += x.UA; s.RT += x.RT; s.NO += x.NO; s.nrt += x.nrt; s.uaDays += x.uaDays; s.late += x.late ? 1 : 0; s.rated += x.rated; });
+    const s = { A: 0, UA: 0, RT: 0, NO: 0, nrt: 0, late: 0, rated: 0 };
+    ws.forEach((x) => { s.A += x.A; s.UA += x.UA; s.RT += x.RT; s.NO += x.NO; s.nrt += x.nrt; s.late += x.late ? 1 : 0; s.rated += x.rated; });
     const base = s.A + s.RT + s.UA;
-    // WATCH trigger: 2 or more UA days in the same category within the phase (owner decision)
+    // WATCH trigger: 2 or more UAs in the same category within the phase (owner decision)
     return { ...s, uaPct: s.UA / base, aPct: s.A / base, repeat: Object.values(po.phaseUA[ph] || {}).some((v) => v >= 2) };
   };
 

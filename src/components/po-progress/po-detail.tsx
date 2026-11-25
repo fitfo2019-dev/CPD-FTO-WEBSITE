@@ -105,7 +105,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                 <table className="w-full text-sm tabular-nums">
                   <thead>
                     <tr className="shell-caps border-b text-left text-[11px] text-muted-foreground">
-                      {["Phase", "UA Days", "UA %", "Class UA %", "A %", "Class A %", "NRT"].map((h) => (
+                      {["Phase", "UAs", "UA %", "Class UA %", "A %", "Class A %", "NRT"].map((h) => (
                         <th key={h} className="px-2 py-1.5 font-bold">{h}</th>
                       ))}
                     </tr>
@@ -123,7 +123,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                       return (
                         <tr key={i} className="border-b">
                           <td className="px-2 py-1.5 font-bold">{PHASE_LABEL[i]}</td>
-                          <td className={cn("px-2 py-1.5", s.uaDays && "font-bold text-err")}>{s.uaDays}</td>
+                          <td className={cn("px-2 py-1.5", s.UA && "font-bold text-err")}>{s.UA}</td>
                           <td className={cn("px-2 py-1.5", s.uaPct > c.uaPct && "font-bold text-err")}>{pct(s.uaPct)}</td>
                           <td className="px-2 py-1.5">{pct(c.uaPct)}</td>
                           <td className="px-2 py-1.5 font-bold text-ok">{pct(s.aPct)}</td>
@@ -136,7 +136,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                 </table>
               </section>
               <section>
-                <H3>Most UA Days · Program</H3>
+                <H3>Most UAs · Program</H3>
                 {top.length ? (
                   <ul className="grid gap-1.5 text-sm">
                     {top.map(([c, v]) => (
