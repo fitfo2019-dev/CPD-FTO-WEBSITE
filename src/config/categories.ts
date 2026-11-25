@@ -1,0 +1,36 @@
+export type Category = { n: number; name: string; rtAllowed: boolean };
+
+export const CATEGORIES: Category[] = [
+  { n: 1, name: "Report/Prepared for Duty", rtAllowed: false },
+  { n: 2, name: "Comprehension/Usage", rtAllowed: true },
+  { n: 3, name: "Public/Police Interaction", rtAllowed: true },
+  { n: 4, name: "Feedback Acceptance", rtAllowed: true },
+  { n: 5, name: "Precinct Orientation", rtAllowed: true },
+  { n: 6, name: "Routine", rtAllowed: false },
+  { n: 7, name: "EVO", rtAllowed: false },
+  { n: 8, name: "Policies/Procedures", rtAllowed: true },
+  { n: 9, name: "Criminal/Traffic Offenses", rtAllowed: true },
+  { n: 10, name: "Arrest, Search, Seizure", rtAllowed: true },
+  { n: 11, name: "Information Gathering", rtAllowed: true },
+  { n: 12, name: "Resource/Equipment Usage", rtAllowed: true },
+  { n: 13, name: "Form Usage", rtAllowed: true },
+  { n: 14, name: "Grammar/Legibility", rtAllowed: true },
+  { n: 15, name: "Content Accuracy", rtAllowed: true },
+  { n: 16, name: "Completion Time", rtAllowed: true },
+  { n: 17, name: "Response to Enforcement", rtAllowed: true },
+  { n: 18, name: "Threat Assessment", rtAllowed: false },
+  { n: 19, name: "Initiating Arrests", rtAllowed: false },
+  { n: 20, name: "Handling Prisoners", rtAllowed: false },
+  { n: 21, name: "Vehicle Stops", rtAllowed: false },
+  { n: 22, name: "Run Approach", rtAllowed: false },
+  { n: 23, name: "Building Search", rtAllowed: false },
+  { n: 24, name: "Pat Down/Searches", rtAllowed: false },
+  { n: 25, name: "Low Stress Situations", rtAllowed: true },
+  { n: 26, name: "High Stress Situations", rtAllowed: true },
+  { n: 27, name: "Arrest Situations", rtAllowed: true },
+  { n: 28, name: "Problem Solving", rtAllowed: true },
+  { n: 29, name: "Motivational Traits", rtAllowed: true },
+  { n: 30, name: "Task Management", rtAllowed: true },
+];
+
+export const RATINGS = ["NO", "A", "RT", "UA", "NRT"] as const;
