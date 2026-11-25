@@ -1,0 +1,282 @@
+[
+ {
+  "name": "Marcus A. Abernathy",
+  "badge": "4210",
+  "fto": "Alan A. Archer",
+  "ftob": "1500",
+  "sched": "4x10"
+ },
+ {
+  "name": "Mira H. Ashford",
+  "badge": "4385",
+  "fto": "Laura W. Fox",
+  "ftob": "2075",
+  "sched": "4x10"
+ },
+ {
+  "name": "Nadia B. Bishop",
+  "badge": "4217",
+  "fto": "Beth F. Drake",
+  "ftob": "1523",
+  "sched": "5x8"
+ },
+ {
+  "name": "Nolan J. Brennan",
+  "badge": "4392",
+  "fto": "Mike E. Irwin",
+  "ftob": "2098",
+  "sched": "5x8"
+ },
+ {
+  "name": "Avery J. Calloway",
+  "badge": "4127",
+  "fto": "Marcus T. Hale",
+  "ftob": "1842",
+  "sched": "5x8"
+ },
+ {
+  "name": "Olivia K. Castillo",
+  "badge": "4399",
+  "fto": "Nina K. Lowe",
+  "ftob": "2121",
+  "sched": "5x8"
+ },
+ {
+  "name": "Owen C. Crowley",
+  "badge": "4224",
+  "fto": "Chris L. Grant",
+  "ftob": "1546",
+  "sched": "5x8"
+ },
+ {
+  "name": "Paige D. Dawson",
+  "badge": "4231",
+  "fto": "Diane S. Jordan",
+  "ftob": "1569",
+  "sched": "5x8"
+ },
+ {
+  "name": "Bianca R. Delgado",
+  "badge": "4133",
+  "fto": "Renee L. Sutter",
+  "ftob": "1590",
+  "sched": "5x8"
+ },
+ {
+  "name": "Quentin E. Ellison",
+  "badge": "4238",
+  "fto": "Eric C. Moss",
+  "ftob": "1592",
+  "sched": "5x8"
+ },
+ {
+  "name": "Caleb M. Fairbanks",
+  "badge": "4140",
+  "fto": "Dana K. Whitlock",
+  "ftob": "2016",
+  "sched": "4x10"
+ },
+ {
+  "name": "Rosa F. Fletcher",
+  "badge": "4245",
+  "fto": "Faith H. Boyd",
+  "ftob": "1615",
+  "sched": "4x10"
+ },
+ {
+  "name": "Samuel G. Garrity",
+  "badge": "4252",
+  "fto": "Glen N. Eaton",
+  "ftob": "1638",
+  "sched": "5x8"
+ },
+ {
+  "name": "Danielle S. Greer",
+  "badge": "4152",
+  "fto": "Owen P. Marsh",
+  "ftob": "1733",
+  "sched": "5x8"
+ },
+ {
+  "name": "Elijah W. Hargrove",
+  "badge": "4158",
+  "fto": "Tessa M. Quinlan",
+  "ftob": "1904",
+  "sched": "5x8"
+ },
+ {
+  "name": "Tara H. Holloway",
+  "badge": "4259",
+  "fto": "Holly W. Hayes",
+  "ftob": "1661",
+  "sched": "5x8"
+ },
+ {
+  "name": "Fiona L. Ingram",
+  "badge": "4161",
+  "fto": "Gavin R. Pruitt",
+  "ftob": "1655",
+  "sched": "5x8"
+ },
+ {
+  "name": "Uriel J. Iverson",
+  "badge": "4266",
+  "fto": "Ivan E. Knox",
+  "ftob": "1684",
+  "sched": "5x8"
+ },
+ {
+  "name": "Gabriel A. Jennings",
+  "badge": "4169",
+  "fto": "Lena S. Okafor",
+  "ftob": "2088",
+  "sched": "4x10"
+ },
+ {
+  "name": "Vanessa K. Jessup",
+  "badge": "4273",
+  "fto": "Jill K. Neal",
+  "ftob": "1707",
+  "sched": "5x8"
+ },
+ {
+  "name": "Wesley L. Keller",
+  "badge": "4280",
+  "fto": "Keith R. Cole",
+  "ftob": "1730",
+  "sched": "4x10"
+ },
+ {
+  "name": "Hannah C. Kowalski",
+  "badge": "4174",
+  "fto": "Victor D. Ramos",
+  "ftob": "1712",
+  "sched": "5x8"
+ },
+ {
+  "name": "Isaiah N. Lambert",
+  "badge": "4180",
+  "fto": "Priya K. Bannon",
+  "ftob": "1967",
+  "sched": "5x8"
+ },
+ {
+  "name": "Ximena M. Lindqvist",
+  "badge": "4287",
+  "fto": "Laura B. Fox",
+  "ftob": "1753",
+  "sched": "5x8"
+ },
+ {
+  "name": "Jasmine T. McAllister",
+  "badge": "4186",
+  "fto": "Colin J. Ferris",
+  "ftob": "1820",
+  "sched": "5x8"
+ },
+ {
+  "name": "Yusuf N. Mercer",
+  "badge": "4294",
+  "fto": "Mike G. Irwin",
+  "ftob": "1776",
+  "sched": "5x8"
+ },
+ {
+  "name": "Zoe P. Nash",
+  "badge": "4301",
+  "fto": "Nina M. Lowe",
+  "ftob": "1799",
+  "sched": "5x8"
+ },
+ {
+  "name": "Kyle D. Norwood",
+  "badge": "4193",
+  "fto": "Monica E. Stiles",
+  "ftob": "1588",
+  "sched": "5x8"
+ },
+ {
+  "name": "Leah P. O'Connell",
+  "badge": "4199",
+  "fto": "Trent W. Gaines",
+  "ftob": "2041",
+  "sched": "5x8"
+ },
+ {
+  "name": "Adrian R. Ortega",
+  "badge": "4308",
+  "fto": "Alan T. Archer",
+  "ftob": "1822",
+  "sched": "5x8"
+ },
+ {
+  "name": "Brooke S. Prescott",
+  "badge": "4315",
+  "fto": "Beth D. Drake",
+  "ftob": "1845",
+  "sched": "4x10"
+ },
+ {
+  "name": "Connor T. Quarles",
+  "badge": "4322",
+  "fto": "Chris J. Grant",
+  "ftob": "1868",
+  "sched": "5x8"
+ },
+ {
+  "name": "Daria W. Redding",
+  "badge": "4329",
+  "fto": "Diane P. Jordan",
+  "ftob": "1891",
+  "sched": "5x8"
+ },
+ {
+  "name": "Ethan A. Sorensen",
+  "badge": "4336",
+  "fto": "Eric A. Moss",
+  "ftob": "1914",
+  "sched": "5x8"
+ },
+ {
+  "name": "Gwen B. Thibault",
+  "badge": "4343",
+  "fto": "Faith F. Boyd",
+  "ftob": "1937",
+  "sched": "5x8"
+ },
+ {
+  "name": "Hector C. Underhill",
+  "badge": "4350",
+  "fto": "Glen L. Eaton",
+  "ftob": "1960",
+  "sched": "4x10"
+ },
+ {
+  "name": "Imani D. Vance",
+  "badge": "4357",
+  "fto": "Holly S. Hayes",
+  "ftob": "1983",
+  "sched": "5x8"
+ },
+ {
+  "name": "Julian E. Whitfield",
+  "badge": "4364",
+  "fto": "Ivan C. Knox",
+  "ftob": "2006",
+  "sched": "5x8"
+ },
+ {
+  "name": "Kara F. Yates",
+  "badge": "4371",
+  "fto": "Jill H. Neal",
+  "ftob": "2029",
+  "sched": "5x8"
+ },
+ {
+  "name": "Logan G. Zeller",
+  "badge": "4378",
+  "fto": "Keith N. Cole",
+  "ftob": "2052",
+  "sched": "5x8"
+ }
+]
