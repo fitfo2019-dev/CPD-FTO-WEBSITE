@@ -5,7 +5,8 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CATEGORIES } from "@/config/categories";
-import { CURRENT_WEEK, FORMULA_VERSION, PHASE_LABEL, PROGRESS, SCORE_VERSION, WEEKS, pct, scorePct, type ProgressPO } from "@/lib/po-progress/data";
+import { CURRENT_WEEK, FORMULA_VERSION, PHASE_LABEL, PROGRESS, SCORE_VERSION, WEEKS, pct, phaseSummaries, scorePct, type ProgressPO } from "@/lib/po-progress/data";
+import { NRT_RULE_VERSION } from "@/lib/po-progress/nrt";
 import { cn } from "@/lib/utils";
 import { PreviouslyFlaggedChip, StatusChip, WeekStrip } from "./parts";
 import { caseSafe } from "@/lib/case-safe";
@@ -73,6 +74,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
     if (x.kind === "rated") for (const c in x.uaByCat) cats[+c] = (cats[+c] || 0) + x.uaByCat[c];
   });
   const top = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const summaries = po ? phaseSummaries(po.calc) : [];
   return (
     <Sheet open={!!po} onOpenChange={(o) => !o && onClose()}>
       <SheetContent side="right" initialFocus={headRef} className="w-full overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-[900px]">
@@ -162,34 +164,46 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
               <details className="group rounded-md border" data-testid="show-calculation">
                 <summary className="shell-caps cursor-pointer px-3 py-2 text-[12px] font-bold text-navy">Show Calculation</summary>
                 <div className="overflow-x-auto border-t px-3 pb-3">
-                  <table className="w-full text-sm tabular-nums">
+                  <table className="calc-table w-full text-sm tabular-nums">
                     <thead>
                       <tr className="shell-caps border-b text-left text-[11px] text-muted-foreground">
-                        {["Week", "Phase", "Rated Days", "UA’s", "Most in One Category", "NRT", "Counted UA’s", "Week Score", "Week Result", "Status After"].map((h) => (
+                        {["Week", "Rated Hours", "UA’s", "Same Task", "Category This Phase", "NRT", "Per 40 Hours", "Week Score", "Week Result", "Status After"].map((h) => (
                           <th key={h} className="px-2 py-1.5 font-bold">{caseSafe(h)}</th>
                         ))}
                       </tr>
                     </thead>
-                    <tbody>
-                      {po.calc.map((r) => (
-                        <tr key={r.w} className="border-b">
-                          <td className="px-2 py-1.5 font-bold">{r.w}</td>
-                          <td className="px-2 py-1.5">{PHASE_LABEL[r.ph - 1]}</td>
-                          <td className="px-2 py-1.5">{r.days}</td>
-                          <td className={cn("px-2 py-1.5", r.UA >= 10 && "font-bold text-err")}>{r.UA}</td>
-                          <td className={cn("px-2 py-1.5", r.topCatUA >= 3 && "font-bold text-[#6a3aa0]")}>
-                            {r.topCat == null ? "–" : `${r.topCatUA} · ${CATEGORIES[r.topCat].n}. ${CATEGORIES[r.topCat].name}`}
+                    {summaries.filter((x) => po.calc.some((r) => r.ph === x.ph)).map((x) => (
+                      <tbody key={x.ph}>
+                        {po.calc.filter((r) => r.ph === x.ph).map((r) => (
+                          <tr key={r.w} className="border-b">
+                            <td className="px-2 py-1.5 font-bold">{r.w}</td>
+                            <td className="px-2 py-1.5" title={r.hoursEdited ? "Edited on the Daily Performance Summary" : undefined}>{r.hours}{r.hoursEdited ? "*" : ""}</td>
+                            <td className="px-2 py-1.5">{r.UA}</td>
+                            <td className={cn("px-2 py-1.5", r.topTaskUA >= 3 && "font-bold text-[#6a3aa0]")}>{r.topTaskUA || "–"}</td>
+                            <td className={cn("data px-2 py-1.5", r.phaseCatUA >= 10 && "font-bold text-err")}>
+                              {r.phaseCat == null ? "–" : `${r.phaseCatUA} · ${CATEGORIES[r.phaseCat].n}. ${CATEGORIES[r.phaseCat].name}`}
+                            </td>
+                            <td className={cn("px-2 py-1.5", r.nrt && "font-bold text-[#6a3aa0]")}>{r.nrt || "–"}</td>
+                            <td className="px-2 py-1.5">{r.perForty ?? "–"}</td>
+                            <td className={cn("px-2 py-1.5 font-bold", r.nrt ? "text-[#6a3aa0]" : "text-navy")}>
+                              {r.scoreNote ? <span className="shell-caps text-[10px] text-muted-foreground">{r.scoreNote}</span> : scorePct(r.score)}
+                            </td>
+                            <td className="px-2 py-1.5" title={r.reason}><StatusChip status={r.band} /></td>
+                            <td className="px-2 py-1.5" title={r.holds.join(" · ") || undefined}><StatusChip status={r.status} /></td>
+                          </tr>
+                        ))}
+                        <tr className="border-b-2 bg-[#f3f5f9]" data-testid={`calc-phase-${x.ph}`}>
+                          <td colSpan={7} className="shell-caps px-2 py-1.5 text-[11px] font-bold text-navy">
+                            Phase {PHASE_LABEL[x.ph - 1]} Score{x.avg != null ? ` · Average of ${x.weeks} ${x.weeks === 1 ? "Week" : "Weeks"} ${scorePct(x.avg)}` : ""}
+                            {x.capReason ? ` · Held to ${scorePct(x.score)} (${x.capReason})` : ""}
                           </td>
-                          <td className={cn("px-2 py-1.5", r.nrt && "font-bold text-[#6a3aa0]")}>{r.nrt || "–"}</td>
-                          <td className="px-2 py-1.5">{r.units}</td>
-                          <td className={cn("px-2 py-1.5 font-bold", r.nrt ? "text-[#6a3aa0]" : "text-navy")}>{scorePct(r.score)}</td>
-                          <td className="px-2 py-1.5" title={r.reason}><StatusChip status={r.band} /></td>
-                          <td className="px-2 py-1.5"><StatusChip status={r.status} /></td>
+                          <td className="px-2 py-1.5 font-extrabold text-navy">{scorePct(x.score)}</td>
+                          <td colSpan={2} />
                         </tr>
-                      ))}
-                    </tbody>
+                      </tbody>
+                    ))}
                   </table>
-                  <p className="mt-2 text-[11px] text-muted-foreground">{FORMULA_VERSION} · {SCORE_VERSION}</p>
+                  <p className="mt-2 text-[11px] text-muted-foreground">{FORMULA_VERSION} · {SCORE_VERSION} · {NRT_RULE_VERSION}</p>
                 </div>
               </details>
               <div className="flex flex-wrap gap-2">

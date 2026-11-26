@@ -6,15 +6,15 @@ export function weekClass(x: Week) {
   if (x.kind === "future") return "wk fut";
   if (x.kind === "limbo") return "wk lim";
   const b = weekBand(x);
-  if (b.level === 2 && b.reason !== "20+ UA's") return "wk nrt";
-  return `wk u${x.UA === 0 ? 0 : x.UA <= 9 ? 1 : x.UA <= 19 ? 2 : 3}${x.lim > 0 ? " haslim" : ""}`;
+  if (b.reason === "NRT" || b.reason.startsWith("3+")) return "wk nrt";
+  return `wk u${x.UA === 0 ? 0 : b.level + 1}${x.lim > 0 ? " haslim" : ""}`;
 }
 
 export function weekTitle(x: Week) {
   if (x.kind === "future") return `Week ${x.w} · not yet worked`;
   if (x.kind === "limbo") return `Week ${x.w} · limbo`;
   const b = weekBand(x);
-  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UA’s"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${!x.nrt && b.topCatUA >= 3 ? ` · ${b.topCatUA} UA’s in one category` : ""}${x.late ? " · late packet" : ""}`;
+  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UA’s"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${!x.nrt && b.reason.startsWith("3+") ? ` · ${b.reason.replace("'", "’")}` : ""}${x.signed ? "" : " · pending signature"}${x.late ? " · late packet" : ""}`;
 }
 
 export function WeekCell({ x, showNum }: { x: Week; showNum?: boolean }) {
@@ -42,17 +42,21 @@ export function WeekStrip({ po, big }: { po: ProgressPO; big?: boolean }) {
   );
 }
 
-function tileClass(s: PhaseStats | null) {
+/** Tile color follows the most serious Status After reached in the phase. */
+function tileClass(s: PhaseStats | null, po: ProgressPO, ph: number) {
   if (!s) return "tile fut";
   if (s.nrt > 0) return "tile nrt";
-  return `tile ${s.UA <= 2 ? "t0" : s.UA <= 5 ? "t1" : s.UA <= 9 ? "t2" : "t3"}`;
+  const rows = po.calc.filter((r) => r.ph === ph && r.scoreNote !== "PENDING SIGNATURE");
+  if (rows.some((r) => r.status === "BELOW STANDARD")) return "tile t3";
+  if (rows.some((r) => r.status === "EMERGING CONCERN")) return "tile t1";
+  return "tile t0";
 }
 
 export function PhaseTiles({ po }: { po: ProgressPO }) {
   return (
     <div className="tiles">
       {po.phases.map((s, i) => (
-        <div key={i} className={tileClass(s)}>
+        <div key={i} className={tileClass(s, po, i + 1)}>
           <span>{PHASE_LABEL[i]}</span>
           <b>{s ? s.UA : "–"}</b>
           <i>{s ? scorePct(s.score) : ""}</i>
@@ -73,7 +77,7 @@ export function StatusChip({ status }: { status: Status }) {
 export function PreviouslyFlaggedChip({ week }: { week: number | null }) {
   if (week == null) return null;
   return (
-    <span className="chip c-gry" title={`Flag cleared in Week ${week} after 2 rated weeks that met standard.`}>
+    <span className="chip c-gry" title={`Flag cleared in Week ${week}.`}>
       Previously Flagged <em>wk {week}</em>
     </span>
   );
@@ -104,10 +108,10 @@ export function TrendLabel({ po }: { po: ProgressPO }) {
 export function Legend() {
   const items: [string, string][] = [
     ["lw u0", "0 UA’s"],
-    ["lw u1", "1-9"],
-    ["lw u2", "10-19"],
-    ["lw u3", "20+"],
-    ["lw nrt", "NRT or 3+ in One Category"],
+    ["lw u1", "Meets Standard"],
+    ["lw u2", "Emerging Concern"],
+    ["lw u3", "Below Standard"],
+    ["lw nrt", "NRT or 3+ on Same Task"],
     ["lw lim", "Limbo week"],
     ["lw u0 haslim", "Week with limbo days"],
     ["lw fut", "Not yet worked"],
