@@ -5,7 +5,7 @@ export default function PoProgress() {
   return (
     <>
       <PageHeader section="Coordinator" title="PO Progress" />
-      <ProgressView />
+      <ProgressView coordinatorScope />
     </>
   );
 }

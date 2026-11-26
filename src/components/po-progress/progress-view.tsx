@@ -15,6 +15,8 @@ const { pos: allPos, classPhase, classWeek } = PROGRESS;
 type Show = "STRUGGLING" | "WATCH" | "ON TRACK" | "ABOVE";
 const SHOW_LABEL: Record<Show, string> = { STRUGGLING: "Struggling", WATCH: "Watch", "ON TRACK": "On Track", ABOVE: "Above Class UA %" };
 const SHOW_PARAM: Record<string, Show> = { struggling: "STRUGGLING", watch: "WATCH", "on-track": "ON TRACK", above: "ABOVE" };
+// Preview sample group; the server roster supplies each Coordinator group after integration.
+const inSampleGroup = (p: ProgressPO) => p.k % 2 === 0;
 const matches = (p: ProgressPO, f: Show) => (f === "ABOVE" ? p.above : p.status === f);
 
 function Cards({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => void }) {
@@ -123,8 +125,9 @@ function Board({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => 
   );
 }
 
-export function ProgressView() {
+export function ProgressView({ coordinatorScope = false }: { coordinatorScope?: boolean }) {
   const [open, setOpen] = useState<ProgressPO | null>(null);
+  const [scope, setScope] = useState<"mine" | "all">(coordinatorScope ? "mine" : "all");
   const [show, setShow] = useState<Show | null>(null);
   const [tab, setTab] = useState("cards");
   useEffect(() => {
@@ -141,14 +144,23 @@ export function ProgressView() {
       }),
     [s],
   );
-  const pos = show ? live.filter((p) => matches(p, show)) : live;
-  const count = (f: Show) => live.filter((p) => matches(p, f)).length;
+  const scoped = scope === "mine" ? live.filter(inSampleGroup) : live;
+  const pos = show ? scoped.filter((p) => matches(p, show)) : scoped;
+  const count = (f: Show) => scoped.filter((p) => matches(p, f)).length;
   const toggle = (f: Show) => setShow((cur) => (cur === f ? null : f));
   const tile = (f: Show, variant: "err" | "warn" | "ok" | "neutral") => (
     <StatCard label={SHOW_LABEL[f]} value={count(f)} variant={variant} onClick={() => toggle(f)} active={show === f} />
   );
   return (
     <>
+      {coordinatorScope ? (
+        <Tabs value={scope} onValueChange={(v) => setScope(v as "mine" | "all")} className="mb-4">
+          <TabsList>
+            <TabsTrigger value="mine" className="shell-caps text-[12px] font-bold" data-testid="tab-my-pos">{caseSafe("My PO’s")}</TabsTrigger>
+            <TabsTrigger value="all" className="shell-caps text-[12px] font-bold" data-testid="tab-all-pos">{caseSafe("All PO’s")}</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      ) : null}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
         {tile("STRUGGLING", "err")}
         {tile("WATCH", "warn")}
