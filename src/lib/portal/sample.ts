@@ -32,7 +32,7 @@ export const FORMS = [
   "Building Search Supplement",
   "Arrest Process",
   "OVI Process",
-  "Probationary Officer Daily Performance Log",
+  "Probationary Officer Daily Performance Summary",
   "Probationary Officer Weekly Performance Summary",
   "Monthly Performance Summary",
   "Probationary Officer Weekly Performance Log",

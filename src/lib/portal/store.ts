@@ -239,7 +239,7 @@ function seedState(): PortalState {
           fto: c.fto,
           date: iso(d),
           phase: c.i,
-          forms: ["Reporting for Duty", ...runs, "Probationary Officer Daily Performance Log"],
+          forms: ["Reporting for Duty", ...runs, "Probationary Officer Daily Performance Summary"],
           status: "submitted_complete",
           reviewedAt: off < -1 ? iso(addDays(d, 1)) : undefined,
         });
