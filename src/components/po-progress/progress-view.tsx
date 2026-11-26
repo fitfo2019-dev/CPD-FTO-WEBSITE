@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StatCard } from "@/components/portal/stat-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FTO_BY, curFto, today, usePortal } from "@/lib/portal/store";
 import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, type ProgressPO } from "@/lib/po-progress/data";
 import { cn } from "@/lib/utils";
 import { Legend, PhaseTiles, StatusChip, TrendLabel, VsClassChip, WeekCell, WeekStrip, trendDir } from "./parts";
 import { PoDetail } from "./po-detail";
+import { caseSafe } from "@/lib/case-safe";
 
-const { pos, classPhase, classWeek } = PROGRESS;
+const { pos: allPos, classPhase, classWeek } = PROGRESS;
 
-function Cards({ onOpen }: { onOpen: (p: ProgressPO) => void }) {
+type Show = "STRUGGLING" | "WATCH" | "ON TRACK" | "ABOVE";
+const SHOW_LABEL: Record<Show, string> = { STRUGGLING: "Struggling", WATCH: "Watch", "ON TRACK": "On Track", ABOVE: "Above Class UA %" };
+const SHOW_PARAM: Record<string, Show> = { struggling: "STRUGGLING", watch: "WATCH", "on-track": "ON TRACK", above: "ABOVE" };
+// Preview sample group; the server roster supplies each Coordinator group after integration.
+const inSampleGroup = (p: ProgressPO) => p.k % 2 === 0;
+const matches = (p: ProgressPO, f: Show) => (f === "ABOVE" ? p.above : p.status === f);
+
+function Cards({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => void }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {pos.map((p) => (
@@ -45,7 +54,7 @@ function Cards({ onOpen }: { onOpen: (p: ProgressPO) => void }) {
 const th = "shell-caps px-1 py-1.5 text-[10px] font-bold text-muted-foreground";
 const stk = "sticky left-0 z-10 bg-card px-3 text-left";
 
-function Board({ onOpen }: { onOpen: (p: ProgressPO) => void }) {
+function Board({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => void }) {
   return (
     <div className="overflow-x-auto rounded-lg border bg-card">
       <table className="w-full border-collapse text-sm tabular-nums">
@@ -62,7 +71,7 @@ function Board({ onOpen }: { onOpen: (p: ProgressPO) => void }) {
           <tr className="border-b">
             <th className={cn(th, stk)} />
             <th />
-            {pos[0].weeks.map((x) => (
+            {allPos[0].weeks.map((x) => (
               <th key={x.w} className={th}>W{x.w}</th>
             ))}
             {PHASE_LABEL.map((l) => (
@@ -116,29 +125,68 @@ function Board({ onOpen }: { onOpen: (p: ProgressPO) => void }) {
   );
 }
 
-export function ProgressView() {
+export function ProgressView({ coordinatorScope = false }: { coordinatorScope?: boolean }) {
   const [open, setOpen] = useState<ProgressPO | null>(null);
-  const count = (s: string) => pos.filter((p) => p.status === s).length;
+  const [scope, setScope] = useState<"mine" | "all">(coordinatorScope ? "mine" : "all");
+  const [show, setShow] = useState<Show | null>(null);
+  const [tab, setTab] = useState("cards");
+  useEffect(() => {
+    const f = SHOW_PARAM[new URLSearchParams(window.location.search).get("show") ?? ""];
+    if (f) setShow(f);
+  }, []);
+  const s = usePortal();
+  // The FTO shown is the PO's current assignment, the same one Probationary Officers shows.
+  const live = useMemo(
+    () =>
+      allPos.map((p) => {
+        const f = FTO_BY[curFto(s, p.badge, today)?.fto ?? ""];
+        return f ? { ...p, fto: f.name.replace(/^(Ofc|Sgt)\. /, ""), ftob: f.badge } : { ...p, fto: "—", ftob: "—" };
+      }),
+    [s],
+  );
+  const scoped = scope === "mine" ? live.filter(inSampleGroup) : live;
+  const pos = show ? scoped.filter((p) => matches(p, show)) : scoped;
+  const count = (f: Show) => scoped.filter((p) => matches(p, f)).length;
+  const toggle = (f: Show) => setShow((cur) => (cur === f ? null : f));
+  const tile = (f: Show, variant: "err" | "warn" | "ok" | "neutral") => (
+    <StatCard label={SHOW_LABEL[f]} value={count(f)} variant={variant} onClick={() => toggle(f)} active={show === f} />
+  );
   return (
     <>
+      {coordinatorScope ? (
+        <Tabs value={scope} onValueChange={(v) => setScope(v as "mine" | "all")} className="mb-4">
+          <TabsList>
+            <TabsTrigger value="mine" className="shell-caps text-[12px] font-bold" data-testid="tab-my-pos">{caseSafe("My PO’s")}</TabsTrigger>
+            <TabsTrigger value="all" className="shell-caps text-[12px] font-bold" data-testid="tab-all-pos">{caseSafe("All PO’s")}</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      ) : null}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
-        <StatCard label="Struggling" value={count("STRUGGLING")} variant="err" />
-        <StatCard label="Watch" value={count("WATCH")} variant="warn" />
-        <StatCard label="On Track" value={count("ON TRACK")} variant="ok" />
-        <StatCard label="Above Class UA %" value={pos.filter((p) => p.above).length} />
-        <StatCard label={`Class UA % · Phase ${PHASE_LABEL[CURRENT_PHASE - 1]}`} value={pct(classPhase[CURRENT_PHASE - 1]?.uaPct)} />
+        {tile("STRUGGLING", "err")}
+        {tile("WATCH", "warn")}
+        {tile("ON TRACK", "ok")}
+        {tile("ABOVE", "neutral")}
+        <StatCard label={`Class UA % · Phase ${PHASE_LABEL[CURRENT_PHASE - 1]}`} value={pct(classPhase[CURRENT_PHASE - 1]?.uaPct)} onClick={() => setTab("board")} />
       </div>
-      <Tabs defaultValue="cards">
-        <TabsList>
-          <TabsTrigger value="cards" className="shell-caps text-[12px] font-bold">Cards</TabsTrigger>
-          <TabsTrigger value="board" className="shell-caps text-[12px] font-bold">Class Board</TabsTrigger>
-        </TabsList>
+      <Tabs value={tab} onValueChange={(v) => setTab(String(v))}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabsList>
+            <TabsTrigger value="cards" className="shell-caps text-[12px] font-bold">Cards</TabsTrigger>
+            <TabsTrigger value="board" className="shell-caps text-[12px] font-bold">Class Board</TabsTrigger>
+          </TabsList>
+          {show ? (
+            <div className="flex items-center gap-2" data-testid="progress-filter">
+              <span className="shell-caps rounded-full border bg-card px-3 py-1 text-[11px] font-bold text-navy">{caseSafe(`Showing ${SHOW_LABEL[show]} (${pos.length})`)}</span>
+              <button type="button" onClick={() => setShow(null)} className="shell-caps text-[11px] font-bold text-navy underline-offset-2 hover:underline">Clear</button>
+            </div>
+          ) : null}
+        </div>
         <TabsContent value="cards" className="mt-4">
-          <Cards onOpen={setOpen} />
+          {pos.length ? <Cards pos={pos} onOpen={setOpen} /> : <p className="shell-caps py-8 text-center text-xs font-bold text-muted-foreground">{caseSafe("No PO’s")}</p>}
           <Legend />
         </TabsContent>
         <TabsContent value="board" className="mt-4">
-          <Board onOpen={setOpen} />
+          <Board pos={pos} onOpen={setOpen} />
           <Legend />
         </TabsContent>
       </Tabs>

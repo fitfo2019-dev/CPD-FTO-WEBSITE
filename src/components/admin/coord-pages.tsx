@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/portal/page-header";
 import { CLASSES, FTOS, FTO_BY, PO_BY, POS, conflicts, curFto, fmt, fmtS, fmtW, iso, key, myPoOn, pageTag, phaseOn, phaseRange, rosterOf, setPortal, today, usePortal, D, isSun, type Packet } from "@/lib/portal/store";
 import { WATCH } from "@/lib/portal/sample";
 import { AdminPage, Card, Modal, PersonCell, Tag, toast } from "./ui";
+import { caseSafe } from "@/lib/case-safe";
 
 const setupHref = (c: string) => `/coordinator/phase-setup?class=${encodeURIComponent(c)}`;
 
@@ -30,7 +31,7 @@ export function CoordinatorDashboard() {
       <PageHeader section="Coordinator" title="Coordinator Dashboard" actions={<span className="mono" style={{ color: "var(--muted)", fontSize: 12 }}>{fmt(today)}</span>} />
       <div className="stats">
         <div className="stat">
-          <small>POs in Field Training</small>
+          <small>{caseSafe("PO’s in Field Training")}</small>
           <b>{inFT}</b>
         </div>
         <div className="stat">
@@ -52,7 +53,7 @@ export function CoordinatorDashboard() {
             <thead>
               <tr>
                 <th>Class</th>
-                <th>POs</th>
+                <th>{caseSafe("PO’s")}</th>
                 <th>Start</th>
                 <th>Current Phase</th>
                 <th>Projected Completion</th>
@@ -369,6 +370,10 @@ export function ProbationaryOfficers() {
   const s = usePortal();
   const [q, setQ] = useState("");
   const [cls, setCls] = useState("");
+  useEffect(() => {
+    const v = new URLSearchParams(window.location.search).get("q");
+    if (v) setQ(v);
+  }, []);
   const t = q.toLowerCase();
   const list = POS.filter((p) => (!cls || p.cls === cls) && (!t || p.name.toLowerCase().includes(t) || p.badge.includes(t)));
   return (
@@ -458,7 +463,7 @@ export function FtoDirectory() {
       <PageHeader section="Coordinator" title="FTO Directory" />
       <section className="card">
         <div className="toolbar" style={{ padding: "14px 18px 0" }}>
-          <input type="search" className="srch" placeholder="Search name, badge or precinct" aria-label="Search FTOs" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input type="search" className="srch" placeholder="Search name, badge or precinct" aria-label="Search FTO’s" value={q} onChange={(e) => setQ(e.target.value)} />
           <label className="f inl">
             Watch
             <select value={watch} onChange={(e) => setWatch(e.target.value)}>
@@ -516,7 +521,7 @@ export function FtoDirectory() {
                 ) : (
                   <tr>
                     <td colSpan={6}>
-                      <div className="empty">No matching FTOs</div>
+                      <div className="empty">{caseSafe("No matching FTO’s")}</div>
                     </td>
                   </tr>
                 )}
@@ -650,12 +655,12 @@ export function MonthlyReports() {
             </div>
             <div>
               {scope === "class" ? "Rows" : "Workbook"}
-              <b>{scope === "class" ? `${roster.length} POs` : po ? PO_BY[po].name : "—"}</b>
+              <b>{scope === "class" ? `${roster.length} PO’s` : po ? PO_BY[po].name : "—"}</b>
             </div>
           </div>
         ) : null}
       </Card>
-      <Card title="Packets Submitted" right={<span className="cnt">{roster.length} POs</span>}>
+      <Card title="Packets Submitted" right={<span className="cnt">{caseSafe(`${roster.length} PO’s`)}</span>}>
         {roster.length ? (
           <div className="tbl-wrap scrollbox">
             <table>

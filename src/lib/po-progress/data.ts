@@ -1,5 +1,6 @@
 import roster from "@/config/sample-roster.json";
 import { CATEGORIES } from "@/config/categories";
+import { POS } from "@/lib/portal/sample";
 
 export type Status = "STRUGGLING" | "WATCH" | "ON TRACK";
 export type Week =
@@ -69,7 +70,10 @@ function build() {
   };
   const catW = CATEGORIES.map((_, i) => [0.02, 0.05, 0.04, 0.03][i % 4] + (i === 14 || i === 13 ? 0.05 : 0) + (i === 10 ? 0.03 : 0));
 
-  const raw = roster.map((p, k) => {
+  // Names and badges come from the portal roster so a PO opens the same person everywhere.
+  const cls = POS.filter((x) => x.cls === "Class 135");
+  const raw = roster.map((r, k) => {
+    const p = { ...r, name: cls[k]?.name ?? r.name, badge: cls[k]?.badge ?? r.badge };
     const prof: Profile =
       k === 3 || k === 17 || k === 29 ? "struggling" : k === 8 || k === 22 ? "declining" : PROFILES[Math.floor(rnd() * PROFILES.length)];
     const days = p.sched === "4x10" ? 4 : 5;
@@ -118,7 +122,7 @@ function build() {
     const s = { A: 0, UA: 0, RT: 0, NO: 0, nrt: 0, late: 0, rated: 0 };
     ws.forEach((x) => { s.A += x.A; s.UA += x.UA; s.RT += x.RT; s.NO += x.NO; s.nrt += x.nrt; s.late += x.late ? 1 : 0; s.rated += x.rated; });
     const base = s.A + s.RT + s.UA;
-    // WATCH trigger: 2 or more UAs in the same category within the phase (owner decision)
+    // WATCH trigger: 2 or more UA’s in the same category within the phase (owner decision)
     return { ...s, uaPct: s.UA / base, aPct: s.A / base, repeat: Object.values(po.phaseUA[ph] || {}).some((v) => v >= 2) };
   };
 
