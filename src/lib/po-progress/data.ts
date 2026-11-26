@@ -31,7 +31,6 @@ export type PhaseStats = {
   rated: number;
   uaPct: number;
   aPct: number;
-  repeat: boolean;
 };
 
 export type ProgressPO = {
@@ -49,7 +48,67 @@ export type ProgressPO = {
   delta: number;
   above: boolean;
   trend: number;
+  /** Week the flag cleared when the PO was flagged earlier and is now MEETS STANDARD. */
+  clearedWeek: number | null;
+  calc: CalcRow[];
 };
+
+const NOTE = "Based on documented ratings; not a release recommendation.";
+export const FORMULA_VERSION = "PO-STD-1 · November 25, 2026";
+export const STATUS_RULE: Record<Status, string> = {
+  "BELOW STANDARD": `A rated week with 20 or more UA's, 3 or more UA's in one category, or an NRT. Steps down one level after a rated week that meets standard. ${NOTE}`,
+  "EMERGING CONCERN": `A rated week with 10-19 UA's. Clears after a rated week that meets standard. ${NOTE}`,
+  "MEETS STANDARD": `Rated weeks with 0-9 UA's, fewer than 3 in any one category and no NRT. ${NOTE}`,
+};
+
+type RatedWeek = Extract<Week, { kind: "rated" }>;
+const LEVELS: Status[] = ["MEETS STANDARD", "EMERGING CONCERN", "BELOW STANDARD"];
+
+export type CalcRow = {
+  w: number;
+  ph: number;
+  days: number;
+  UA: number;
+  topCat: number | null;
+  topCatUA: number;
+  nrt: number;
+  band: Status;
+  reason: string;
+  status: Status;
+};
+
+/** Band for one rated week under the program standard. */
+export function weekBand(x: RatedWeek): { level: 0 | 1 | 2; reason: string; topCat: number | null; topCatUA: number } {
+  let topCat: number | null = null, topCatUA = 0;
+  for (const c in x.uaByCat) if (x.uaByCat[+c] > topCatUA) { topCat = +c; topCatUA = x.uaByCat[+c]; }
+  if (x.nrt > 0) return { level: 2, reason: "NRT", topCat, topCatUA };
+  if (topCatUA >= 3) return { level: 2, reason: "3+ UA's in one category", topCat, topCatUA };
+  if (x.UA >= 20) return { level: 2, reason: "20+ UA's", topCat, topCatUA };
+  if (x.UA >= 10) return { level: 1, reason: "10-19 UA's", topCat, topCatUA };
+  return { level: 0, reason: "0-9 UA's", topCat, topCatUA };
+}
+
+/**
+ * Program standard (owner decision, set 28). Each rated week is banded:
+ * MEETS STANDARD 0-9 UA's; EMERGING CONCERN 10-19; BELOW STANDARD 20+, 3+ UA's in one category, or an NRT.
+ * A worse week raises the status to that band. Each rated week that meets standard lowers it one level.
+ * Limbo weeks are not rated and do not count. Late packets never affect a PO's status.
+ */
+export function evaluateStandard(weeks: Week[]): { status: Status; clearedWeek: number | null; calc: CalcRow[] } {
+  let level = 0;
+  let flagged = false;
+  let clearedWeek: number | null = null;
+  const calc: CalcRow[] = [];
+  for (const x of weeks) {
+    if (x.kind !== "rated") continue;
+    const b = weekBand(x);
+    if (b.level > level) { level = b.level; flagged = true; }
+    else if (b.level === 0 && level > 0 && --level === 0) clearedWeek = x.w;
+    calc.push({ w: x.w, ph: x.ph, days: x.rated, UA: x.UA, topCat: b.topCat, topCatUA: b.topCatUA, nrt: x.nrt, band: LEVELS[b.level], reason: b.reason, status: LEVELS[level] });
+  }
+  return { status: LEVELS[level], clearedWeek: level === 0 && flagged ? clearedWeek : null, calc };
+}
+
 
 export const WEEKS = 15;
 export const CURRENT_WEEK = 14;
@@ -92,22 +151,22 @@ function build() {
         weeks.push({ w, kind: "limbo", worked: days });
         continue;
       }
-      const f = { strong: 0.25, steady: 0.6, improving: Math.max(0.2, 1.6 - 0.11 * w), declining: 0.4 + 0.22 * w, frequent: 2.6 + 0.12 * w }[prof];
+      const f = { strong: 0.7, steady: 1.1, improving: Math.max(0.6, 2.2 - 0.12 * w), declining: 0.7 + 0.12 * w, frequent: 2.2 + 0.08 * w }[prof];
       let A = 0, UA = 0, RT = 0, NO = 0, nrt = 0;
       const uaByCat: Record<number, number> = {};
       for (let d = 0; d < rated; d++)
         for (let c = 0; c < CATEGORIES.length; c++) {
           const r = rnd();
           if (r < 0.12) { NO++; continue; }
-          if (r < 0.12 + catW[c] * f * 0.11) { UA++; uaByCat[c] = (uaByCat[c] || 0) + 1; }
-          else if (r < 0.12 + catW[c] * f * 0.11 + 0.03) RT++;
+          if (r < 0.12 + catW[c] * f * 0.24) { UA++; uaByCat[c] = (uaByCat[c] || 0) + 1; }
+          else if (r < 0.12 + catW[c] * f * 0.24 + 0.03) RT++;
           else A++;
         }
       phaseUA[ph] = phaseUA[ph] || {};
       for (const c in uaByCat) {
         const before = phaseUA[ph][c] || 0;
         phaseUA[ph][c] = before + uaByCat[c];
-        if (before < 3 && before + uaByCat[c] >= 3 && prof !== "strong") { nrt++; nrtCats.add(+c); }
+        if (before < 5 && before + uaByCat[c] >= 5 && (prof === "frequent" || prof === "declining")) { nrt++; nrtCats.add(+c); }
       }
       const late = rnd() < 0.04;
       if (prof === "frequent" && ((k === 3 && w === 14) || (k === 29 && w === 13))) nrt++;
@@ -122,8 +181,7 @@ function build() {
     const s = { A: 0, UA: 0, RT: 0, NO: 0, nrt: 0, late: 0, rated: 0 };
     ws.forEach((x) => { s.A += x.A; s.UA += x.UA; s.RT += x.RT; s.NO += x.NO; s.nrt += x.nrt; s.late += x.late ? 1 : 0; s.rated += x.rated; });
     const base = s.A + s.RT + s.UA;
-    // WATCH trigger: 2 or more UA’s in the same category within the phase (owner decision)
-    return { ...s, uaPct: s.UA / base, aPct: s.A / base, repeat: Object.values(po.phaseUA[ph] || {}).some((v) => v >= 2) };
+    return { ...s, uaPct: s.UA / base, aPct: s.A / base };
   };
 
   const classPhase: ({ uaPct: number; aPct: number } | null)[] = [1, 2, 3, 4].map((ph) => {
@@ -141,9 +199,9 @@ function build() {
     const phases = [1, 2, 3, 4].map((ph) => stats(p, ph));
     const cur = phases[CURRENT_PHASE - 1]!;
     const prev = phases[CURRENT_PHASE - 2];
-    const status: Status = cur.nrt > 0 ? "BELOW STANDARD" : cur.repeat || cur.late ? "EMERGING CONCERN" : "MEETS STANDARD";
+    const { status, clearedWeek, calc } = evaluateStandard(p.weeks);
     const delta = cur.uaPct - classPhase[CURRENT_PHASE - 1]!.uaPct;
-    return { ...p, phases, status, delta, above: delta > 0, trend: prev ? cur.uaPct - prev.uaPct : 0 };
+    return { ...p, phases, status, clearedWeek, calc, delta, above: delta > 0, trend: prev ? cur.uaPct - prev.uaPct : 0 };
   });
   const sev = (p: ProgressPO) => (p.status === "BELOW STANDARD" ? 300 : p.status === "EMERGING CONCERN" ? 200 : 100) + (p.above ? 50 : 0) + p.delta * 100;
   pos.sort((a, b) => sev(b) - sev(a));
