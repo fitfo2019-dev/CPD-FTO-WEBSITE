@@ -122,7 +122,7 @@ function build() {
     const s = { A: 0, UA: 0, RT: 0, NO: 0, nrt: 0, late: 0, rated: 0 };
     ws.forEach((x) => { s.A += x.A; s.UA += x.UA; s.RT += x.RT; s.NO += x.NO; s.nrt += x.nrt; s.late += x.late ? 1 : 0; s.rated += x.rated; });
     const base = s.A + s.RT + s.UA;
-    // WATCH trigger: 2 or more UAs in the same category within the phase (owner decision)
+    // WATCH trigger: 2 or more UA’s in the same category within the phase (owner decision)
     return { ...s, uaPct: s.UA / base, aPct: s.A / base, repeat: Object.values(po.phaseUA[ph] || {}).some((v) => v >= 2) };
   };
 

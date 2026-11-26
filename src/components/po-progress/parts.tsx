@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, type PhaseStats, type ProgressPO, type Status, type Week } from "@/lib/po-progress/data";
+import { caseSafe } from "@/lib/case-safe";
 
 export function weekClass(x: Week) {
   if (x.kind === "future") return "wk fut";
@@ -11,7 +12,7 @@ export function weekClass(x: Week) {
 export function weekTitle(x: Week) {
   if (x.kind === "future") return `Week ${x.w} · not yet worked`;
   if (x.kind === "limbo") return `Week ${x.w} · limbo`;
-  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UAs"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${x.late ? " · late packet" : ""}`;
+  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UA’s"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${x.late ? " · late packet" : ""}`;
 }
 
 export function WeekCell({ x, showNum }: { x: Week; showNum?: boolean }) {
@@ -87,7 +88,7 @@ export function TrendLabel({ po }: { po: ProgressPO }) {
 
 export function Legend() {
   const items: [string, string][] = [
-    ["lw u0", "0 UAs"],
+    ["lw u0", "0 UA’s"],
     ["lw u1", "1-2"],
     ["lw u2", "3-5"],
     ["lw u3", "6+"],
@@ -101,7 +102,7 @@ export function Legend() {
       {items.map(([c, l]) => (
         <span key={l}>
           <i className={c} />
-          {l}
+          {caseSafe(l)}
         </span>
       ))}
     </div>

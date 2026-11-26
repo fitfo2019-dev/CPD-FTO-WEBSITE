@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StatCard } from "@/components/portal/stat-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FTO_BY, curFto, today, usePortal } from "@/lib/portal/store";
 import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, type ProgressPO } from "@/lib/po-progress/data";
 import { cn } from "@/lib/utils";
 import { Legend, PhaseTiles, StatusChip, TrendLabel, VsClassChip, WeekCell, WeekStrip, trendDir } from "./parts";
 import { PoDetail } from "./po-detail";
+import { caseSafe } from "@/lib/case-safe";
 
 const { pos: allPos, classPhase, classWeek } = PROGRESS;
 
@@ -129,8 +131,18 @@ export function ProgressView() {
     const f = SHOW_PARAM[new URLSearchParams(window.location.search).get("show") ?? ""];
     if (f) setShow(f);
   }, []);
-  const pos = show ? allPos.filter((p) => matches(p, show)) : allPos;
-  const count = (f: Show) => allPos.filter((p) => matches(p, f)).length;
+  const s = usePortal();
+  // The FTO shown is the PO's current assignment, the same one Probationary Officers shows.
+  const live = useMemo(
+    () =>
+      allPos.map((p) => {
+        const f = FTO_BY[curFto(s, p.badge, today)?.fto ?? ""];
+        return f ? { ...p, fto: f.name.replace(/^(Ofc|Sgt)\. /, ""), ftob: f.badge } : { ...p, fto: "—", ftob: "—" };
+      }),
+    [s],
+  );
+  const pos = show ? live.filter((p) => matches(p, show)) : live;
+  const count = (f: Show) => live.filter((p) => matches(p, f)).length;
   const toggle = (f: Show) => setShow((cur) => (cur === f ? null : f));
   const tile = (f: Show, variant: "err" | "warn" | "ok" | "neutral") => (
     <StatCard label={SHOW_LABEL[f]} value={count(f)} variant={variant} onClick={() => toggle(f)} active={show === f} />
@@ -152,13 +164,13 @@ export function ProgressView() {
           </TabsList>
           {show ? (
             <div className="flex items-center gap-2" data-testid="progress-filter">
-              <span className="shell-caps rounded-full border bg-card px-3 py-1 text-[11px] font-bold text-navy">{`Showing ${SHOW_LABEL[show]} (${pos.length})`}</span>
+              <span className="shell-caps rounded-full border bg-card px-3 py-1 text-[11px] font-bold text-navy">{caseSafe(`Showing ${SHOW_LABEL[show]} (${pos.length})`)}</span>
               <button type="button" onClick={() => setShow(null)} className="shell-caps text-[11px] font-bold text-navy underline-offset-2 hover:underline">Clear</button>
             </div>
           ) : null}
         </div>
         <TabsContent value="cards" className="mt-4">
-          {pos.length ? <Cards pos={pos} onOpen={setOpen} /> : <p className="shell-caps py-8 text-center text-xs font-bold text-muted-foreground">No PO&rsquo;s</p>}
+          {pos.length ? <Cards pos={pos} onOpen={setOpen} /> : <p className="shell-caps py-8 text-center text-xs font-bold text-muted-foreground">{caseSafe("No PO’s")}</p>}
           <Legend />
         </TabsContent>
         <TabsContent value="board" className="mt-4">

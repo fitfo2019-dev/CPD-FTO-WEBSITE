@@ -5,6 +5,7 @@ import { CLASSES, FTOS, FTO_BY, PO_BY, busy, conflicts, extDays, fmt, fmtS, fmtW
 import { DEFAULT_WEEKS, MAX_PHASES, MIN_PHASES, PHASE_COLORS } from "@/lib/portal/sample";
 import { PageHeader } from "@/components/portal/page-header";
 import { AdminPage, Card, Modal, PoChecklist, Tag, toast } from "./ui";
+import { caseSafe } from "@/lib/case-safe";
 
 const shuffle = <T,>(a: T[]) => {
   const x = [...a];
@@ -166,11 +167,11 @@ export function PhaseSetup({ initialClass }: { initialClass?: string }) {
         title="Phase Setup"
         actions={
           <div className="step-wrap">
-            {["Import Class", "Phase Weeks", "Assign FTOs"].map((l, k) => {
+            {["Import Class", "Phase Weeks", "Assign FTO’s"].map((l, k) => {
               const n = k + 1;
               return (
                 <span key={l} className={`step-pill ${n < cur || (n === 3 && done3) ? "done" : n === cur ? "cur" : ""}`}>
-                  {n} · {l}
+                  {n} · {caseSafe(l)}
                 </span>
               );
             })}
@@ -357,7 +358,7 @@ export function PhaseSetup({ initialClass }: { initialClass?: string }) {
           <label className="f inl">
             Show
             <select value={show} onChange={(e) => setShow(e.target.value)}>
-              <option value="all">All POs</option>
+              <option value="all">All PO’s</option>
               <option value="open">Unassigned</option>
               <option value="flag">Conflicts · Withdrawn · Repeat FTO</option>
             </select>
@@ -553,7 +554,7 @@ export function PhaseSetup({ initialClass }: { initialClass?: string }) {
         <div className="polist">
           {(["random", "pick"] as const).map((m) => (
             <label key={m}>
-              <input type="radio" name="aPo" checked={aPo === m} onChange={() => setAPo(m)} /> <span className="f" style={{ fontSize: 12, color: "var(--ink)" }}>{m === "random" ? "Random" : "Selected POs"}</span>
+              <input type="radio" name="aPo" checked={aPo === m} onChange={() => setAPo(m)} /> <span className="f" style={{ fontSize: 12, color: "var(--ink)" }}>{m === "random" ? "Random" : "Selected PO’s"}</span>
             </label>
           ))}
         </div>

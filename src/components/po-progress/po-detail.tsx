@@ -8,6 +8,7 @@ import { CATEGORIES } from "@/config/categories";
 import { CURRENT_WEEK, PHASE_LABEL, PROGRESS, WEEKS, pct, type ProgressPO } from "@/lib/po-progress/data";
 import { cn } from "@/lib/utils";
 import { StatusChip, WeekStrip } from "./parts";
+import { caseSafe } from "@/lib/case-safe";
 
 function WeekChart({ po }: { po: ProgressPO }) {
   const W = 640, H = 220, m = 40;
@@ -111,8 +112,8 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                 <table className="w-full text-sm tabular-nums">
                   <thead>
                     <tr className="shell-caps border-b text-left text-[11px] text-muted-foreground">
-                      {["Phase", "UAs", "UA %", "Class UA %", "A %", "Class A %", "NRT"].map((h) => (
-                        <th key={h} className="px-2 py-1.5 font-bold">{h}</th>
+                      {["Phase", "UA’s", "UA %", "Class UA %", "A %", "Class A %", "NRT"].map((h) => (
+                        <th key={h} className="px-2 py-1.5 font-bold">{caseSafe(h)}</th>
                       ))}
                     </tr>
                   </thead>
@@ -142,7 +143,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                 </table>
               </section>
               <section>
-                <H3>Most UAs · Program</H3>
+                <H3>{caseSafe("Most UA’s · Program")}</H3>
                 {top.length ? (
                   <ul className="grid gap-1.5 text-sm">
                     {top.map(([c, v]) => (
