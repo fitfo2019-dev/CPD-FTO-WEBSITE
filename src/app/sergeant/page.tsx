@@ -12,7 +12,7 @@ export default function SergeantDashboard() {
   const today = new Date().toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "numeric", timeZone: "America/New_York" });
   return (
     <>
-      <PageHeader section="FTO Sergeant" title="Sergeant Dashboard" actions={<span className="font-mono text-xs text-muted-foreground">{today}</span>} />
+      <PageHeader section="FTO Sergeant" title="Sergeant Dashboard" photo="officers-portrait" actions={<span className="font-mono text-xs text-muted-foreground">{today}</span>} />
       <div className="mb-5 grid gap-4 sm:grid-cols-3">
         <StatCard label="Open NRT" value={ALERTS.filter((a) => a.tag === "NRT").length} />
         <StatCard label="Non-Release" value={ALERTS.filter((a) => a.tag === "Non-Release").length} />

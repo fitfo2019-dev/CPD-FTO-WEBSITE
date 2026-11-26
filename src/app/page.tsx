@@ -2,6 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ClipboardCheck, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { BadgeMark } from "@/components/portal/badge-mark";
+import { HomePhotos } from "@/components/portal/home-photos";
+
+const JOURNEY = ["Academy", "Phase I", "Phase II", "Phase III", "Phase IV", "Probationary Phase"];
 
 const ROLES = [
   { href: "/coordinator", title: "FTO Coordinator", icon: LayoutDashboard, items: ["Review Desk", "Phase Setup", "PO Progress", "Monthly Reports"] },
@@ -12,21 +16,22 @@ const ROLES = [
 export default function Home() {
   return (
     <div className="min-h-screen">
-      <header className="bg-navy">
+      <HomePhotos>
         <div className="mx-auto flex max-w-[1100px] flex-col items-center gap-6 px-4 py-12 text-center sm:py-16">
+          <div className="flex items-center gap-4">
+            <BadgeMark height={64} />
+            <Image src="/patch.png" alt="Columbus Division of Police patch" width={60} height={70} className="h-[64px] w-auto" />
+          </div>
           <div className="rounded-md bg-white px-4 py-3">
             <Image src="/wm.png" alt="The City of Columbus" width={220} height={62} priority className="h-auto w-[190px] sm:w-[220px]" />
-          </div>
-          <div className="flex items-center gap-4">
-            <Image src="/badge.png" alt="Columbus Division of Police badge" width={60} height={70} className="h-[64px] w-auto" />
-            <Image src="/patch.png" alt="Columbus Division of Police patch" width={60} height={70} className="h-[64px] w-auto" />
           </div>
           <div>
             <p className="shell-caps text-[12px] font-semibold text-white/75">Columbus Division of Police</p>
             <h1 className="shell-caps mt-2 text-3xl font-extrabold text-white sm:text-4xl">Field Training Portal</h1>
           </div>
+          <ol className="home-journey">{JOURNEY.map((step) => <li key={step}>{step}</li>)}</ol>
         </div>
-      </header>
+      </HomePhotos>
       <main className="mx-auto -mt-8 grid max-w-[1100px] gap-5 px-4 pb-16 md:grid-cols-3">
         {ROLES.map(({ href, title, icon: Icon, items }) => (
           <Link key={href} href={href} className="group rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">

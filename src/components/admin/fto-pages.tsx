@@ -20,7 +20,7 @@ export function PhaseSignUp() {
   const mine = rows.filter((x) => signed(s, x.c, x.i).includes(ME)).length;
   return (
     <AdminPage>
-      <PageHeader section="FTO" title="Phase Sign-Up" />
+      <PageHeader section="FTO" title="Phase Sign-Up" photo="graduation-oath" />
       <Card title="Open Phases" right={<Tag k={mine ? "ok" : undefined}>{`${mine} Signed Up`}</Tag>}>
         <div className="tbl-wrap">
           <table>
@@ -121,7 +121,7 @@ export function MyProbationaryOfficer() {
   const cur = mine.find((x) => x.r && x.r.s <= today && today <= x.r.e);
   return (
     <AdminPage>
-      <PageHeader section="FTO" title="My Probationary Officer" />
+      <PageHeader section="FTO" title="My Probationary Officer" photo="new-officers" />
       <Card title="Current Assignment" right={cur ? <Tag k="ok">{`Phase ${cur.i + 1} Active`}</Tag> : null}>
         {cur && cur.r ? (
           <div className="meta">

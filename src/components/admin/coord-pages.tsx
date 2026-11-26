@@ -30,7 +30,7 @@ export function CoordinatorDashboard() {
   ];
   return (
     <AdminPage>
-      <PageHeader section="Coordinator" title="Coordinator Dashboard" actions={<span className="mono" style={{ color: "var(--muted)", fontSize: 12 }}>{fmt(today)}</span>} />
+      <PageHeader section="Coordinator" title="Coordinator Dashboard" photo="graduation-oath" actions={<span className="mono" style={{ color: "var(--muted)", fontSize: 12 }}>{fmt(today)}</span>} />
       <div className="stats s5">
         <Link href="/coordinator/po-progress?show=below-standard" className={`stat click ${review ? "e" : ""}`} data-testid="stat-po-review">
           <small>{caseSafe("PO’s Below Standard")}</small>
@@ -466,7 +466,7 @@ export function FtoDirectory() {
   const list = FTOS.filter((f) => (!watch || f.watch === watch) && (!t || `${f.name} ${f.badge} ${f.pct}`.toLowerCase().includes(t)));
   return (
     <AdminPage>
-      <PageHeader section="Coordinator" title="FTO Directory" />
+      <PageHeader section="Coordinator" title="FTO Directory" photo="class-seated" />
       <section className="card">
         <div className="toolbar" style={{ padding: "14px 18px 0" }}>
           <input type="search" className="srch" placeholder="Search name, badge or precinct" aria-label="Search FTO’s" value={q} onChange={(e) => setQ(e.target.value)} />
