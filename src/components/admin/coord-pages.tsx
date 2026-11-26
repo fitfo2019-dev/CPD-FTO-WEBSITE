@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/portal/page-header";
 import { CLASSES, FTOS, FTO_BY, PO_BY, POS, conflicts, curFto, fmt, fmtS, fmtW, iso, key, myPoOn, pageTag, phaseOn, phaseRange, rosterOf, setPortal, today, usePortal, D, isSun, type Packet } from "@/lib/portal/store";
 import { WATCH } from "@/lib/portal/sample";
@@ -369,6 +369,10 @@ export function ProbationaryOfficers() {
   const s = usePortal();
   const [q, setQ] = useState("");
   const [cls, setCls] = useState("");
+  useEffect(() => {
+    const v = new URLSearchParams(window.location.search).get("q");
+    if (v) setQ(v);
+  }, []);
   const t = q.toLowerCase();
   const list = POS.filter((p) => (!cls || p.cls === cls) && (!t || p.name.toLowerCase().includes(t) || p.badge.includes(t)));
   return (

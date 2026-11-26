@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -85,6 +86,11 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
               <SheetDescription>
                 Badge {po.badge} · FTO {po.fto} · Badge {po.ftob} · {po.sched}
               </SheetDescription>
+              <div>
+                <Button variant="outline" size="sm" className="shell-caps mt-1 font-bold" render={<Link href={`/coordinator/probationary-officers?q=${po.badge}`} />} nativeButton={false}>
+                  Open Full Profile
+                </Button>
+              </div>
             </SheetHeader>
             <div className="grid gap-6 px-4 pb-6">
               <section>
