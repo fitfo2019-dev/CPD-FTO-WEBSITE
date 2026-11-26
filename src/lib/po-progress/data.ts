@@ -77,7 +77,7 @@ export const NRT_UA_WEIGHT = 20;
 export const NRT_PHASE_CAP = 60;
 export const EMERGING_CAP = 80;
 export const FULL_WEEK_HOURS = 40;
-/** Weekly total UA's by phase: [Emerging Concern at, Below Standard at]. Owner decision, November 26, 2026. */
+/** Weekly total UA's per 40 rated hours by phase: [Emerging Concern at, Below Standard at]. Owner decisions, November 26, 2026. */
 export const WEEKLY_TOTALS: Record<number, [number, number]> = { 1: [12, 24], 2: [10, 20], 3: [8, 16], 4: [5, 10] };
 /** UA's in one category within a phase: [Emerging Concern at, Below Standard at]; resets each phase. */
 export const CATEGORY_PHASE: [number, number] = [10, 15];
@@ -118,8 +118,8 @@ export function phaseScore(scores: number[], phase: { nrt: number; catMax: numbe
 }
 
 export const STATUS_RULE: Record<Status, string> = {
-  "BELOW STANDARD": `A rated week at or over the phase limit (Phase I 24, II 20, III 16, IV 10 UA's), 3 or more UA's on the same task in a week, 15 or more UA's in one category this phase, or an NRT until the FTO Office records the NRT meeting outcome. ${NOTE}`,
-  "EMERGING CONCERN": `A rated week at or over the phase line (Phase I 12, II 10, III 8, IV 5 UA's), or 10-14 UA's in one category this phase. ${NOTE}`,
+  "BELOW STANDARD": `A rated week at or over the phase limit (Phase I 24, II 20, III 16, IV 10 UA's per 40 rated hours), 3 or more UA's on the same task in a week, 15 or more UA's in one category this phase, or an NRT until the FTO Office records the NRT meeting outcome. ${NOTE}`,
+  "EMERGING CONCERN": `A rated week at or over the phase line (Phase I 12, II 10, III 8, IV 5 UA's per 40 rated hours), or 10-14 UA's in one category this phase. ${NOTE}`,
   "MEETS STANDARD": `Under every line, with no NRT awaiting its meeting outcome. ${NOTE}`,
 };
 
@@ -171,11 +171,12 @@ export function weekBand(x: RatedWeek): { level: 0 | 1 | 2; reason: string; topC
     return r(0, "0-9 UA's");
   }
   const [em, below] = WEEKLY_TOTALS[x.ph];
+  const ua40 = perForty(x.UA, x.hours);
   if (x.nrt > 0) return r(2, "NRT");
   if (topTaskUA >= SAME_TASK_WEEK) return r(2, "3+ UA's on the same task");
-  if (x.UA >= below) return r(2, `${below}+ UA's`);
-  if (x.UA >= em) return r(1, `${em}-${below - 1} UA's`);
-  return r(0, `0-${em - 1} UA's`);
+  if (ua40 >= below) return r(2, `${below}+ UA's per 40 hours`);
+  if (ua40 >= em) return r(1, `${em}-${below - 1} UA's per 40 hours`);
+  return r(0, `Under ${em} UA's per 40 hours`);
 }
 
 /**
