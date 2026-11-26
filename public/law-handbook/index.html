@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#a6192e">
+  <meta name="description" content="Search 3,350 Ohio Revised Code sections and research related Ohio cases.">
+  <title>Resources | Ohio Law Desk</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#workspace">Skip to research tools</a>
+  <header class="site-header">
+    <div class="shell topbar">
+      <a class="brand" href="./index.html" aria-label="Ohio Law Desk home">
+        <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h5a3 3 0 0 1 3 3v12a4 4 0 0 0-3-1H4zm16 0h-5a3 3 0 0 0-3 3v12a4 4 0 0 1 3-1h5z"/></svg></span>
+        Ohio Law Desk
+      </a>
+      <nav aria-label="Main navigation"><a id="nav-orc" href="./index.html" aria-current="page">Ohio resources</a><a id="nav-ccc" href="./index.html?workbook=columbus">Columbus workbook</a><a href="#sources">Sources</a></nav>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="shell hero-inner">
+        <div>
+          <p class="breadcrumb"><span>Research Library</span><span aria-hidden="true"> / </span><span id="breadcrumb-current">Resources</span></p>
+          <h1 id="hero-title">Ohio Law Resources</h1>
+          <p class="lede" id="hero-description">Search the Ohio Revised Code, review related decisions, and study the law section by section.</p>
+        </div>
+        <div class="edition">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M4 9h16L12 3zm2 2v7m4-7v7m4-7v7m4-7v7"/></svg>
+          <div><span id="edition-label">Statute snapshot</span><strong id="edition-date">November 24, 2026</strong></div>
+        </div>
+      </div>
+    </section>
+    <div class="shell workspace" id="workspace">
+      <aside class="sidebar" aria-labelledby="library-heading">
+        <h2 class="eyebrow" id="library-heading">Browse the library</h2>
+        <div class="scope" id="scopes">
+          <button class="scope-button active" data-scope="statutes" type="button" aria-pressed="true"><span>All statutes</span><span class="badge" id="total-statutes">3,350</span></button>
+          <button class="scope-button" data-scope="city" type="button" aria-pressed="false" hidden><span>All city sections</span><span class="badge" id="total-city"></span></button>
+          <button class="scope-button" data-scope="cases" type="button" aria-pressed="false"><span>Case law</span><span class="badge" id="total-cases"></span></button>
+          <button class="scope-button" data-scope="topics" type="button" aria-pressed="false"><span>Casebook topics</span><span class="badge" id="total-topics"></span></button>
+          <button class="scope-button" data-scope="complaints" type="button" aria-pressed="false" disabled><span>Complaint manual</span></button>
+          <button class="scope-button" data-scope="saved" type="button" aria-pressed="false"><span>Saved for review</span><span class="badge" id="total-saved">0</span></button>
+        </div>
+        <div class="titles">
+          <h3 class="eyebrow" id="title-scope">Ohio Revised Code</h3>
+          <div id="titles"></div>
+        </div>
+        <div class="sidebar-note"><strong id="scope-note-title">Ohio Revised Code reference</strong><p id="scope-note-text">Full text for every section in Titles 29, 31 and 45.</p></div>
+      </aside>
+      <section class="research" aria-labelledby="search-heading">
+        <div class="search-card">
+          <h2 id="search-heading">Search the library</h2>
+          <form id="search-form" role="search">
+            <div class="search-wrap">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+              <label class="sr-only" for="search">Search the current collection</label>
+              <input id="search" type="search" placeholder="Enter an ORC number, title, or phrase…" autocomplete="off" spellcheck="false">
+              <button class="primary" type="submit">Search</button>
+            </div>
+          </form>
+          <div class="shortcuts" id="shortcuts" aria-label="Example searches"><span>Try</span><button type="button" data-query="2903.01">2903.01</button><button type="button" data-query="4511.19">4511.19</button><button type="button" data-query="3109.04">3109.04</button><button type="button" data-query="prior calculation and design">Prior calculation and design</button></div>
+        </div>
+        <div class="results-top">
+          <div><p class="eyebrow" id="result-kicker">Statute index</p><h2 id="results-heading">All statutes</h2></div>
+          <div class="filters" id="filters">
+            <label class="sr-only" for="chapter">Filter by chapter</label>
+            <select id="chapter"><option value="">All chapters</option></select>
+          </div>
+        </div>
+        <p class="result-status" id="result-status" role="status" aria-live="polite">Loading the statute index…</p>
+        <div class="result-list" id="results" aria-labelledby="results-heading"></div>
+        <nav class="pagination" id="pagination" aria-label="Result pages" hidden>
+          <button type="button" id="previous">Previous</button><span id="page-range"></span><button type="button" id="next">Next</button>
+        </nav>
+      </section>
+    </div>
+    <section class="sources" id="sources" aria-labelledby="source-heading">
+      <div class="shell">
+        <p class="eyebrow">Research sources</p>
+        <h2 id="source-heading">Verify against the original sources</h2>
+        <div class="source-links">
+          <a href="https://codes.ohio.gov/ohio-revised-code" target="_blank" rel="noopener noreferrer"><strong>Ohio Laws</strong><span>Official statutes and version history</span></a>
+          <a href="https://opd.ohio.gov/law-library/criminal-law-casebook" target="_blank" rel="noopener noreferrer"><strong>Ohio Public Defender</strong><span>Criminal Law Casebook</span></a>
+          <a href="https://www.supremecourt.ohio.gov/rod/docs/" target="_blank" rel="noopener noreferrer"><strong>Supreme Court of Ohio</strong><span>Official Ohio opinions</span></a>
+          <a href="https://law.justia.com/cases/ohio/" target="_blank" rel="noopener noreferrer"><strong>Justia</strong><span>Ohio case law library</span></a>
+          <a href="https://caselaw.findlaw.com/court/ohio" target="_blank" rel="noopener noreferrer"><strong>FindLaw</strong><span>Ohio case law library</span></a>
+          <a href="https://library.municode.com/oh/columbus/codes/code_of_ordinances" target="_blank" rel="noopener noreferrer"><strong>Columbus City Code</strong><span>Municode, including uncodified ordinances</span></a>
+        </div>
+        <p class="footnote">For research and study, not legal advice. Verify the version of the law that applies and check later treatment before relying on a case.</p>
+      </div>
+    </section>
+  </main>
+  <dialog id="review" aria-labelledby="review-title">
+    <div class="review-head">
+      <div class="review-head-content"><p class="eyebrow" id="review-kicker"></p><h2 id="review-title" tabindex="-1"></h2><p id="review-meta"></p></div>
+      <button id="close-review" class="close" type="button" aria-label="Close review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="review-tools" id="review-tools"></div>
+    <div class="review-main" id="review-main"></div>
+  </dialog>
+  <dialog id="complaint-reader" aria-labelledby="complaint-reader-title">
+    <div class="review-head">
+      <div class="review-head-content"><p class="eyebrow" data-reader-citation></p><h2 id="complaint-reader-title" tabindex="-1" data-reader-title></h2></div>
+      <button class="close" type="button" aria-label="Close large print" data-reader-close><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="reader-toolbar">
+      <button class="primary" type="button" data-complaint-copy>Copy wording</button>
+      <button class="secondary" type="button" data-reader-size="-1" aria-label="Decrease text size">A−</button>
+      <button class="secondary" type="button" data-reader-size="1" aria-label="Increase text size">A+</button>
+      <span data-reader-source></span>
+      <div data-copy-status role="status" class="copy-status"></div>
+    </div>
+    <div class="reader-scroll">
+      <p class="review-note" data-reader-warning hidden>Reference only. Check the original page before using this wording.</p>
+      <p data-complaint-text></p>
+    </div>
+  </dialog>
+  <template id="arrow"><svg class="result-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5"/></svg></template>
+</body>
+</html>

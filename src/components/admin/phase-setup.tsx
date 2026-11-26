@@ -21,7 +21,7 @@ function readyPhase(s: PortalState, c: string) {
   return n >= 0 && rosterOf(c).every((p) => s.asg[key(p.badge, n)]) ? n : -1;
 }
 
-export function PhaseSetup({ initialClass }: { initialClass?: string }) {
+export function PhaseSetup({ initialClass, section = "Coordinator" }: { initialClass?: string; section?: string }) {
   const s = usePortal();
   const [pick, setPick] = useState(initialClass || "");
   const [cls, setCls] = useState<string | null>(initialClass && s.setups[initialClass] ? initialClass : null);
@@ -163,7 +163,7 @@ export function PhaseSetup({ initialClass }: { initialClass?: string }) {
   return (
     <AdminPage>
       <PageHeader
-        section="Coordinator"
+        section={section}
         title="Phase Setup"
         actions={
           <div className="step-wrap">

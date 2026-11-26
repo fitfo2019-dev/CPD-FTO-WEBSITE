@@ -32,10 +32,10 @@ function Cards({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => 
         >
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
-              <div className="truncate font-extrabold text-navy">{p.name}</div>
-              <div className="truncate text-xs text-muted-foreground">Badge {p.badge} · FTO {p.fto}</div>
+              <div className="break-words font-extrabold text-navy">{p.name}</div>
+              <div className="break-words text-xs text-muted-foreground">Badge {p.badge} · FTO {p.fto}</div>
             </div>
-            <StatusChip status={p.status} />
+            <div className="shrink-0 whitespace-nowrap"><StatusChip status={p.status} /></div>
           </div>
           <WeekStrip po={p} />
           <PhaseTiles po={p} />

@@ -1,11 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ClipboardCheck, LayoutDashboard } from "lucide-react";
+import { ArrowRight, ClipboardCheck, LayoutDashboard, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const ROLES = [
   { href: "/coordinator", title: "FTO Coordinator", icon: LayoutDashboard, items: ["Review Desk", "Phase Setup", "PO Progress", "Monthly Reports"] },
   { href: "/fto", title: "Field Training Officer", icon: ClipboardCheck, items: ["Daily Packet", "Phase Sign-Up", "Day-Off Coverage", "My Probationary Officer"] },
+  { href: "/sergeant", title: "FTO Sergeant", icon: ShieldCheck, items: ["Sergeant Dashboard", "Phase Setup", "PO Progress", "Help Desk"] },
 ];
 
 export default function Home() {
@@ -26,7 +27,7 @@ export default function Home() {
           </div>
         </div>
       </header>
-      <main className="mx-auto -mt-8 grid max-w-[1100px] gap-5 px-4 pb-16 md:grid-cols-2">
+      <main className="mx-auto -mt-8 grid max-w-[1100px] gap-5 px-4 pb-16 md:grid-cols-3">
         {ROLES.map(({ href, title, icon: Icon, items }) => (
           <Link key={href} href={href} className="group rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy">
             <Card className="h-full rounded-lg shadow-sm transition-shadow group-hover:shadow-md">
