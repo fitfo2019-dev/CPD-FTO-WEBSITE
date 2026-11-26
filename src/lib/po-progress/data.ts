@@ -31,6 +31,8 @@ export type PhaseStats = {
   rated: number;
   uaPct: number;
   aPct: number;
+  /** PO-SCORE-1 phase score, 0-100. */
+  score: number;
 };
 
 export type ProgressPO = {
@@ -55,6 +57,29 @@ export type ProgressPO = {
 
 const NOTE = "Based on documented ratings; not a release recommendation.";
 export const FORMULA_VERSION = "PO-STD-1 · November 25, 2026";
+export const SCORE_VERSION = "PO-SCORE-1 · November 26, 2026";
+/** Advisory score (owner decision, November 26, 2026); applies to weeks rated on or after that date and is never applied retroactively. */
+export const NRT_UA_WEIGHT = 20;
+export const NRT_PHASE_CAP = 60;
+
+/** Deficiency units for one rated week: each NRT replaces its paired UA and counts as 20 UA's. */
+export function weekUnits(x: { UA: number; nrt: number }): number {
+  return Math.max(0, x.UA - x.nrt) + NRT_UA_WEIGHT * x.nrt;
+}
+
+/** 100% less 2 points per unit through 20 units, then 1 point per unit, reaching 0% at 80 units. */
+export function unitScore(units: number): number {
+  return units <= 20 ? 100 - 2 * units : Math.max(0, 60 - (units - 20));
+}
+
+export const weekScore = (x: { UA: number; nrt: number }) => unitScore(weekUnits(x));
+
+/** Phase score: average of rated week scores to one decimal; held to 60% or lower when the phase has an NRT. Limbo weeks are excluded. */
+export function phaseScore(ws: { UA: number; nrt: number }[]): number | null {
+  if (!ws.length) return null;
+  const avg = Math.round((ws.reduce((a, x) => a + weekScore(x), 0) / ws.length) * 10) / 10;
+  return ws.some((x) => x.nrt > 0) ? Math.min(avg, NRT_PHASE_CAP) : avg;
+}
 export const STATUS_RULE: Record<Status, string> = {
   "BELOW STANDARD": `A rated week with 20 or more UA's, 3 or more UA's in one category, or an NRT. Steps down one level after a rated week that meets standard. ${NOTE}`,
   "EMERGING CONCERN": `A rated week with 10-19 UA's. Clears after a rated week that meets standard. ${NOTE}`,
@@ -72,6 +97,8 @@ export type CalcRow = {
   topCat: number | null;
   topCatUA: number;
   nrt: number;
+  units: number;
+  score: number;
   band: Status;
   reason: string;
   status: Status;
@@ -104,7 +131,7 @@ export function evaluateStandard(weeks: Week[]): { status: Status; clearedWeek: 
     const b = weekBand(x);
     if (b.level > level) { level = b.level; flagged = true; }
     else if (b.level === 0 && level > 0 && --level === 0) clearedWeek = x.w;
-    calc.push({ w: x.w, ph: x.ph, days: x.rated, UA: x.UA, topCat: b.topCat, topCatUA: b.topCatUA, nrt: x.nrt, band: LEVELS[b.level], reason: b.reason, status: LEVELS[level] });
+    calc.push({ w: x.w, ph: x.ph, days: x.rated, UA: x.UA, topCat: b.topCat, topCatUA: b.topCatUA, nrt: x.nrt, units: weekUnits(x), score: weekScore(x), band: LEVELS[b.level], reason: b.reason, status: LEVELS[level] });
   }
   return { status: LEVELS[level], clearedWeek: level === 0 && flagged ? clearedWeek : null, calc };
 }
@@ -181,7 +208,7 @@ function build() {
     const s = { A: 0, UA: 0, RT: 0, NO: 0, nrt: 0, late: 0, rated: 0 };
     ws.forEach((x) => { s.A += x.A; s.UA += x.UA; s.RT += x.RT; s.NO += x.NO; s.nrt += x.nrt; s.late += x.late ? 1 : 0; s.rated += x.rated; });
     const base = s.A + s.RT + s.UA;
-    return { ...s, uaPct: s.UA / base, aPct: s.A / base };
+    return { ...s, uaPct: s.UA / base, aPct: s.A / base, score: phaseScore(ws)! };
   };
 
   const classPhase: ({ uaPct: number; aPct: number } | null)[] = [1, 2, 3, 4].map((ph) => {
@@ -211,6 +238,7 @@ function build() {
 export const PROGRESS = build();
 
 export const pct = (v: number | null | undefined) => (v == null ? "–" : `${(v * 100).toFixed(1)}%`);
+export const scorePct = (v: number | null | undefined) => (v == null ? "–" : `${Number.isInteger(v) ? v : v.toFixed(1)}%`);
 
 // Preview sample group; the server roster supplies each Coordinator group after integration.
 export const inSampleGroup = (p: { k: number }) => p.k % 2 === 0;

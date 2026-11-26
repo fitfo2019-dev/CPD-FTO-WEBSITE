@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CATEGORIES } from "@/config/categories";
-import { CURRENT_WEEK, FORMULA_VERSION, PHASE_LABEL, PROGRESS, WEEKS, pct, type ProgressPO } from "@/lib/po-progress/data";
+import { CURRENT_WEEK, FORMULA_VERSION, PHASE_LABEL, PROGRESS, SCORE_VERSION, WEEKS, pct, scorePct, type ProgressPO } from "@/lib/po-progress/data";
 import { cn } from "@/lib/utils";
 import { PreviouslyFlaggedChip, StatusChip, WeekStrip } from "./parts";
 import { caseSafe } from "@/lib/case-safe";
@@ -75,7 +75,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
   const top = Object.entries(cats).sort((a, b) => b[1] - a[1]).slice(0, 6);
   return (
     <Sheet open={!!po} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side="right" initialFocus={headRef} className="w-full overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-[720px]">
+      <SheetContent side="right" initialFocus={headRef} className="w-full overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-[900px]">
         {po && (
           <>
             <SheetHeader ref={headRef} tabIndex={-1} className="border-b pr-12 outline-none">
@@ -113,7 +113,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                 <table className="w-full text-sm tabular-nums">
                   <thead>
                     <tr className="shell-caps border-b text-left text-[11px] text-muted-foreground">
-                      {["Phase", "UA’s", "UA %", "Class UA %", "A %", "Class A %", "NRT"].map((h) => (
+                      {["Phase", "Score", "UA’s", "UA %", "Class UA %", "A %", "Class A %", "NRT"].map((h) => (
                         <th key={h} className="px-2 py-1.5 font-bold">{caseSafe(h)}</th>
                       ))}
                     </tr>
@@ -125,12 +125,13 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                         return (
                           <tr key={i} className="border-b text-muted-foreground">
                             <td className="px-2 py-1.5">{PHASE_LABEL[i]}</td>
-                            <td colSpan={6} className="px-2 py-1.5">Not yet worked</td>
+                            <td colSpan={7} className="px-2 py-1.5">Not yet worked</td>
                           </tr>
                         );
                       return (
                         <tr key={i} className="border-b">
                           <td className="px-2 py-1.5 font-bold">{PHASE_LABEL[i]}</td>
+                          <td className={cn("px-2 py-1.5 font-bold", s.nrt ? "text-[#6a3aa0]" : "text-navy")}>{scorePct(s.score)}</td>
                           <td className={cn("px-2 py-1.5", s.UA && "font-bold text-err")}>{s.UA}</td>
                           <td className={cn("px-2 py-1.5", s.uaPct > c.uaPct && "font-bold text-err")}>{pct(s.uaPct)}</td>
                           <td className="px-2 py-1.5">{pct(c.uaPct)}</td>
@@ -164,7 +165,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                   <table className="w-full text-sm tabular-nums">
                     <thead>
                       <tr className="shell-caps border-b text-left text-[11px] text-muted-foreground">
-                        {["Week", "Phase", "Rated Days", "UA’s", "Most in One Category", "NRT", "Week Result", "Status After"].map((h) => (
+                        {["Week", "Phase", "Rated Days", "UA’s", "Most in One Category", "NRT", "Counted UA’s", "Week Score", "Week Result", "Status After"].map((h) => (
                           <th key={h} className="px-2 py-1.5 font-bold">{caseSafe(h)}</th>
                         ))}
                       </tr>
@@ -180,13 +181,15 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                             {r.topCat == null ? "–" : `${r.topCatUA} · ${CATEGORIES[r.topCat].n}. ${CATEGORIES[r.topCat].name}`}
                           </td>
                           <td className={cn("px-2 py-1.5", r.nrt && "font-bold text-[#6a3aa0]")}>{r.nrt || "–"}</td>
+                          <td className="px-2 py-1.5">{r.units}</td>
+                          <td className={cn("px-2 py-1.5 font-bold", r.nrt ? "text-[#6a3aa0]" : "text-navy")}>{scorePct(r.score)}</td>
                           <td className="px-2 py-1.5" title={r.reason}><StatusChip status={r.band} /></td>
                           <td className="px-2 py-1.5"><StatusChip status={r.status} /></td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
-                  <p className="mt-2 text-[11px] text-muted-foreground">{FORMULA_VERSION}</p>
+                  <p className="mt-2 text-[11px] text-muted-foreground">{FORMULA_VERSION} · {SCORE_VERSION}</p>
                 </div>
               </details>
               <div className="flex flex-wrap gap-2">

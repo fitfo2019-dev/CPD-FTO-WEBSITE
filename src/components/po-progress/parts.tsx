@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, STATUS_RULE, weekBand, type PhaseStats, type ProgressPO, type Status, type Week } from "@/lib/po-progress/data";
+import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, scorePct, STATUS_RULE, weekBand, type PhaseStats, type ProgressPO, type Status, type Week } from "@/lib/po-progress/data";
 import { caseSafe } from "@/lib/case-safe";
 
 export function weekClass(x: Week) {
@@ -55,7 +55,7 @@ export function PhaseTiles({ po }: { po: ProgressPO }) {
         <div key={i} className={tileClass(s)}>
           <span>{PHASE_LABEL[i]}</span>
           <b>{s ? s.UA : "–"}</b>
-          <i>{s ? pct(s.aPct) : ""}</i>
+          <i>{s ? scorePct(s.score) : ""}</i>
         </div>
       ))}
     </div>
