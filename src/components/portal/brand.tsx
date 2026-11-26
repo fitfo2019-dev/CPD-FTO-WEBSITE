@@ -5,8 +5,9 @@ export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex flex-col items-center gap-3 text-center">
       {!compact && (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-[18px]">
           <BadgeMark height={52} />
+          <span aria-hidden="true" className="h-10 w-px bg-white/35" />
           <Image src="/patch.png" alt="Columbus Division of Police patch" width={44} height={52} className="h-[52px] w-auto" />
         </div>
       )}

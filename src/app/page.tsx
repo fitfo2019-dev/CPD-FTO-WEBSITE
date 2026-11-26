@@ -18,8 +18,9 @@ export default function Home() {
     <div className="min-h-screen">
       <HomePhotos>
         <div className="mx-auto flex max-w-[1100px] flex-col items-center gap-6 px-4 py-12 text-center sm:py-16">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-[22px]">
             <BadgeMark height={64} />
+            <span aria-hidden="true" className="h-12 w-px bg-white/40" />
             <Image src="/patch.png" alt="Columbus Division of Police patch" width={60} height={70} className="h-[64px] w-auto" />
           </div>
           <div className="rounded-md bg-white px-4 py-3">
