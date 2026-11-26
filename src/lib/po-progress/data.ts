@@ -2,7 +2,7 @@ import roster from "@/config/sample-roster.json";
 import { CATEGORIES } from "@/config/categories";
 import { POS } from "@/lib/portal/sample";
 
-export type Status = "STRUGGLING" | "WATCH" | "ON TRACK";
+export type Status = "BELOW STANDARD" | "EMERGING CONCERN" | "MEETS STANDARD";
 export type Week =
   | { w: number; kind: "future" }
   | { w: number; kind: "limbo"; worked: number }
@@ -59,8 +59,8 @@ export const phaseOf = (w: number) => (w <= 4 ? 1 : w <= 8 ? 2 : w <= 12 ? 3 : 4
 export const CURRENT_PHASE = phaseOf(CURRENT_WEEK);
 const limboDays = (w: number) => (w === 1 ? 99 : w === 5 ? 2 : w === 9 || w === 13 ? 1 : 0);
 
-type Profile = "strong" | "steady" | "improving" | "declining" | "struggling";
-const PROFILES: Profile[] = ["strong", "strong", "steady", "steady", "steady", "improving", "improving", "declining", "struggling", "steady"];
+type Profile = "strong" | "steady" | "improving" | "declining" | "frequent";
+const PROFILES: Profile[] = ["strong", "strong", "steady", "steady", "steady", "improving", "improving", "declining", "frequent", "steady"];
 
 function build() {
   let seed = 135;
@@ -75,7 +75,7 @@ function build() {
   const raw = roster.map((r, k) => {
     const p = { ...r, name: cls[k]?.name ?? r.name, badge: cls[k]?.badge ?? r.badge };
     const prof: Profile =
-      k === 3 || k === 17 || k === 29 ? "struggling" : k === 8 || k === 22 ? "declining" : PROFILES[Math.floor(rnd() * PROFILES.length)];
+      k === 3 || k === 17 || k === 29 ? "frequent" : k === 8 || k === 22 ? "declining" : PROFILES[Math.floor(rnd() * PROFILES.length)];
     const days = p.sched === "4x10" ? 4 : 5;
     const weeks: Week[] = [];
     const phaseUA: Record<number, Record<number, number>> = {};
@@ -92,7 +92,7 @@ function build() {
         weeks.push({ w, kind: "limbo", worked: days });
         continue;
       }
-      const f = { strong: 0.25, steady: 0.6, improving: Math.max(0.2, 1.6 - 0.11 * w), declining: 0.4 + 0.22 * w, struggling: 2.6 + 0.12 * w }[prof];
+      const f = { strong: 0.25, steady: 0.6, improving: Math.max(0.2, 1.6 - 0.11 * w), declining: 0.4 + 0.22 * w, frequent: 2.6 + 0.12 * w }[prof];
       let A = 0, UA = 0, RT = 0, NO = 0, nrt = 0;
       const uaByCat: Record<number, number> = {};
       for (let d = 0; d < rated; d++)
@@ -110,7 +110,7 @@ function build() {
         if (before < 3 && before + uaByCat[c] >= 3 && prof !== "strong") { nrt++; nrtCats.add(+c); }
       }
       const late = rnd() < 0.04;
-      if (prof === "struggling" && ((k === 3 && w === 14) || (k === 29 && w === 13))) nrt++;
+      if (prof === "frequent" && ((k === 3 && w === 14) || (k === 29 && w === 13))) nrt++;
       weeks.push({ w, kind: "rated", ph, lim, rated, A, UA, RT, NO, nrt, uaByCat, late });
     }
     return { ...p, k, weeks, phaseUA, nrtCats: [...nrtCats] };
@@ -141,11 +141,11 @@ function build() {
     const phases = [1, 2, 3, 4].map((ph) => stats(p, ph));
     const cur = phases[CURRENT_PHASE - 1]!;
     const prev = phases[CURRENT_PHASE - 2];
-    const status: Status = cur.nrt > 0 ? "STRUGGLING" : cur.repeat || cur.late ? "WATCH" : "ON TRACK";
+    const status: Status = cur.nrt > 0 ? "BELOW STANDARD" : cur.repeat || cur.late ? "EMERGING CONCERN" : "MEETS STANDARD";
     const delta = cur.uaPct - classPhase[CURRENT_PHASE - 1]!.uaPct;
     return { ...p, phases, status, delta, above: delta > 0, trend: prev ? cur.uaPct - prev.uaPct : 0 };
   });
-  const sev = (p: ProgressPO) => (p.status === "STRUGGLING" ? 300 : p.status === "WATCH" ? 200 : 100) + (p.above ? 50 : 0) + p.delta * 100;
+  const sev = (p: ProgressPO) => (p.status === "BELOW STANDARD" ? 300 : p.status === "EMERGING CONCERN" ? 200 : 100) + (p.above ? 50 : 0) + p.delta * 100;
   pos.sort((a, b) => sev(b) - sev(a));
   return { pos, classPhase, classWeek };
 }
@@ -153,3 +153,6 @@ function build() {
 export const PROGRESS = build();
 
 export const pct = (v: number | null | undefined) => (v == null ? "–" : `${(v * 100).toFixed(1)}%`);
+
+// Preview sample group; the server roster supplies each Coordinator group after integration.
+export const inSampleGroup = (p: { k: number }) => p.k % 2 === 0;

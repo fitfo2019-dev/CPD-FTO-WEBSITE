@@ -61,7 +61,7 @@ export function PhaseTiles({ po }: { po: ProgressPO }) {
 }
 
 export function StatusChip({ status }: { status: Status }) {
-  return <span className={cn("chip", status === "STRUGGLING" ? "c-red" : status === "WATCH" ? "c-yel" : "c-grn")}>{status}</span>;
+  return <span className={cn("chip", status === "BELOW STANDARD" ? "c-red" : status === "EMERGING CONCERN" ? "c-yel" : "c-grn")}>{status}</span>;
 }
 
 export function VsClassChip({ po }: { po: ProgressPO }) {

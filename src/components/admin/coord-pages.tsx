@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/portal/page-header";
 import { CLASSES, FTOS, FTO_BY, PO_BY, POS, conflicts, curFto, fmt, fmtS, fmtW, iso, key, myPoOn, pageTag, phaseOn, phaseRange, rosterOf, setPortal, today, usePortal, D, isSun, type Packet } from "@/lib/portal/store";
 import { WATCH } from "@/lib/portal/sample";
+import { PROGRESS, inSampleGroup } from "@/lib/po-progress/data";
 import { AdminPage, Card, Modal, PersonCell, Tag, toast } from "./ui";
 import { caseSafe } from "@/lib/case-safe";
 
@@ -19,6 +20,7 @@ export function CoordinatorDashboard() {
   const inFT = POS.filter((p) => phaseOn(s, p.badge, today) >= 0).length;
   const cf = conflicts(s);
   const wd = s.wd.length;
+  const review = PROGRESS.pos.filter((p) => inSampleGroup(p) && p.status === "BELOW STANDARD").length;
   const flags: { po: string; i: number; fto: string; flag: "Conflict" | "Withdrawn" }[] = [
     ...cf.slice(0, 8).map((a) => ({ po: a.po, i: a.i, fto: a.fto, flag: "Conflict" as const })),
     ...s.wd.slice(0, 8).flatMap((k) => {
@@ -29,7 +31,11 @@ export function CoordinatorDashboard() {
   return (
     <AdminPage>
       <PageHeader section="Coordinator" title="Coordinator Dashboard" actions={<span className="mono" style={{ color: "var(--muted)", fontSize: 12 }}>{fmt(today)}</span>} />
-      <div className="stats">
+      <div className="stats s5">
+        <Link href="/coordinator/po-progress?show=below-standard" className={`stat click ${review ? "e" : ""}`} data-testid="stat-po-review">
+          <small>{caseSafe("PO’s Below Standard")}</small>
+          <b>{review}</b>
+        </Link>
         <div className="stat">
           <small>{caseSafe("PO’s in Field Training")}</small>
           <b>{inFT}</b>

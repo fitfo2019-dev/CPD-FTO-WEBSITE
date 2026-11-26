@@ -89,6 +89,7 @@
 .ap .stat small{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .ap .stat b{display:block;font-size:26px;font-weight:800;color:var(--navy);margin-top:4px;font-variant-numeric:tabular-nums}
 .ap .stat.e b{color:var(--err)}
+.ap .stats.s5{grid-template-columns:repeat(5,minmax(0,1fr))}.ap a.stat{text-decoration:none;transition:box-shadow .15s}.ap a.stat:hover{box-shadow:0 4px 12px rgba(15,36,70,.12)}.ap a.stat:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
 .ap .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
 .ap .tabs{display:flex;gap:6px}
 .ap .tabs button{border:1px solid var(--line);background:#fff;color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:6px 12px;border-radius:999px;cursor:pointer}
@@ -105,6 +106,6 @@
 .ap .sticky1 td:first-child,.ap .sticky1 th:first-child{position:sticky;left:0;z-index:1;background:#fff;box-shadow:1px 0 0 var(--line-2)}
 .ap .sticky1 th:first-child{background:#f6f8fb;z-index:3}
 .ap .lock{opacity:.5;pointer-events:none}
-@media (max-width:860px){.ap .stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ap .grid2{grid-template-columns:1fr}.ap input[type=text],.ap input[type=email],.ap input[type=tel]{min-width:0;width:100%}.ap .srch{min-width:0;flex:1 1 100%}.ap .toolbar .cnt{margin-left:0}}
+@media (max-width:860px){.ap .stats,.ap .stats.s5{grid-template-columns:repeat(2,minmax(0,1fr))}.ap .grid2{grid-template-columns:1fr}.ap input[type=text],.ap input[type=email],.ap input[type=tel]{min-width:0;width:100%}.ap .srch{min-width:0;flex:1 1 100%}.ap .toolbar .cnt{margin-left:0}}
 .ap .tag{white-space:nowrap}
 @media (max-width:1023px){.ap:has(.actions){padding-bottom:70px}}
