@@ -251,7 +251,7 @@ function seedState(): PortalState {
     f.priorPhases = Math.floor(rnd() * 3);
     f.priorLastEnd = rnd() < 0.7 ? iso(addDays(today, -40 - Math.floor(rnd() * 200))) : null;
     const [first, ...rest] = f.name.split(" ").slice(1);
-    f.email = `${first[0]}${rest.join("").replace(/[^A-Za-z]/g, "")}@columbuspolice.org`;
+    f.email = `${first[0]}${rest.join("").replace(/[^A-Za-z]/g, "")}@example.org`;
     f.phone = `(614) 555-${String(1000 + Math.floor(rnd() * 8999)).slice(-4)}`;
   }
   FTO_BY[ME].priorPhases = 6;

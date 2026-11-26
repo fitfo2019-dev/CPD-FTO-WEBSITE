@@ -76,7 +76,7 @@ export const POS: PO[] = [];
           cls: c.id,
           name: nm,
           badge: String(bdg),
-          email: `${f[0]}${l.replace(/[^A-Za-z]/g, "")}@columbuspolice.org`,
+          email: `${f[0]}${l.replace(/[^A-Za-z]/g, "")}@example.org`,
           phone: `(614) 555-${String(1000 + Math.floor(rnd() * 8999)).slice(-4)}`,
         });
       }
