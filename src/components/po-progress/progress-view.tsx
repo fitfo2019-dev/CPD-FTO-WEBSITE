@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { StatCard } from "@/components/portal/stat-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FTO_BY, curFto, today, usePortal } from "@/lib/portal/store";
-import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, type ProgressPO } from "@/lib/po-progress/data";
+import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, inSampleGroup, pct, type ProgressPO } from "@/lib/po-progress/data";
 import { cn } from "@/lib/utils";
 import { Legend, PhaseTiles, StatusChip, TrendLabel, VsClassChip, WeekCell, WeekStrip, trendDir } from "./parts";
 import { PoDetail } from "./po-detail";
@@ -12,11 +12,9 @@ import { caseSafe } from "@/lib/case-safe";
 
 const { pos: allPos, classPhase, classWeek } = PROGRESS;
 
-type Show = "STRUGGLING" | "WATCH" | "ON TRACK" | "ABOVE";
-const SHOW_LABEL: Record<Show, string> = { STRUGGLING: "Struggling", WATCH: "Watch", "ON TRACK": "On Track", ABOVE: "Above Class UA %" };
-const SHOW_PARAM: Record<string, Show> = { struggling: "STRUGGLING", watch: "WATCH", "on-track": "ON TRACK", above: "ABOVE" };
-// Preview sample group; the server roster supplies each Coordinator group after integration.
-const inSampleGroup = (p: ProgressPO) => p.k % 2 === 0;
+type Show = "BELOW STANDARD" | "EMERGING CONCERN" | "MEETS STANDARD" | "ABOVE";
+const SHOW_LABEL: Record<Show, string> = { "BELOW STANDARD": "Below Standard", "EMERGING CONCERN": "Emerging Concern", "MEETS STANDARD": "Meets Standard", ABOVE: "Above Class UA %" };
+const SHOW_PARAM: Record<string, Show> = { "below-standard": "BELOW STANDARD", "emerging-concern": "EMERGING CONCERN", "meets-standard": "MEETS STANDARD", above: "ABOVE" };
 const matches = (p: ProgressPO, f: Show) => (f === "ABOVE" ? p.above : p.status === f);
 
 function Cards({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => void }) {
@@ -29,7 +27,7 @@ function Cards({ pos, onOpen }: { pos: ProgressPO[]; onOpen: (p: ProgressPO) => 
           onClick={() => onOpen(p)}
           className={cn(
             "rounded-lg border border-l-4 bg-card p-4 text-left transition hover:shadow-md focus-visible:outline-2 focus-visible:outline-navy",
-            p.status === "STRUGGLING" ? "border-l-err" : p.status === "WATCH" ? "border-l-[#e2b007]" : "border-l-line",
+            p.status === "BELOW STANDARD" ? "border-l-err" : p.status === "EMERGING CONCERN" ? "border-l-[#e2b007]" : "border-l-line",
           )}
         >
           <div className="flex items-start justify-between gap-2">
@@ -162,9 +160,9 @@ export function ProgressView({ coordinatorScope = false }: { coordinatorScope?: 
         </Tabs>
       ) : null}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
-        {tile("STRUGGLING", "err")}
-        {tile("WATCH", "warn")}
-        {tile("ON TRACK", "ok")}
+        {tile("BELOW STANDARD", "err")}
+        {tile("EMERGING CONCERN", "warn")}
+        {tile("MEETS STANDARD", "ok")}
         {tile("ABOVE", "neutral")}
         <StatCard label={`Class UA % · Phase ${PHASE_LABEL[CURRENT_PHASE - 1]}`} value={pct(classPhase[CURRENT_PHASE - 1]?.uaPct)} onClick={() => setTab("board")} />
       </div>

@@ -5,9 +5,9 @@ import { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { CATEGORIES } from "@/config/categories";
-import { CURRENT_WEEK, PHASE_LABEL, PROGRESS, WEEKS, pct, type ProgressPO } from "@/lib/po-progress/data";
+import { CURRENT_WEEK, FORMULA_VERSION, PHASE_LABEL, PROGRESS, WEEKS, pct, type ProgressPO } from "@/lib/po-progress/data";
 import { cn } from "@/lib/utils";
-import { StatusChip, WeekStrip } from "./parts";
+import { PreviouslyFlaggedChip, StatusChip, WeekStrip } from "./parts";
 import { caseSafe } from "@/lib/case-safe";
 
 function WeekChart({ po }: { po: ProgressPO }) {
@@ -83,6 +83,7 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
               <div className="flex flex-wrap items-center gap-3">
                 <SheetTitle className="text-xl font-extrabold text-navy">{po.name}</SheetTitle>
                 <StatusChip status={po.status} />
+                <PreviouslyFlaggedChip week={po.clearedWeek} />
               </div>
               <SheetDescription>
                 Badge {po.badge} · FTO {po.fto} · Badge {po.ftob} · {po.sched}
@@ -157,6 +158,37 @@ export function PoDetail({ po, onClose }: { po: ProgressPO | null; onClose: () =
                   <p className="text-sm text-muted-foreground">None</p>
                 )}
               </section>
+              <details className="group rounded-md border" data-testid="show-calculation">
+                <summary className="shell-caps cursor-pointer px-3 py-2 text-[12px] font-bold text-navy">Show Calculation</summary>
+                <div className="overflow-x-auto border-t px-3 pb-3">
+                  <table className="w-full text-sm tabular-nums">
+                    <thead>
+                      <tr className="shell-caps border-b text-left text-[11px] text-muted-foreground">
+                        {["Week", "Phase", "Rated Days", "UA’s", "Most in One Category", "NRT", "Week Result", "Status After"].map((h) => (
+                          <th key={h} className="px-2 py-1.5 font-bold">{caseSafe(h)}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {po.calc.map((r) => (
+                        <tr key={r.w} className="border-b">
+                          <td className="px-2 py-1.5 font-bold">{r.w}</td>
+                          <td className="px-2 py-1.5">{PHASE_LABEL[r.ph - 1]}</td>
+                          <td className="px-2 py-1.5">{r.days}</td>
+                          <td className={cn("px-2 py-1.5", r.UA >= 10 && "font-bold text-err")}>{r.UA}</td>
+                          <td className={cn("px-2 py-1.5", r.topCatUA >= 3 && "font-bold text-[#6a3aa0]")}>
+                            {r.topCat == null ? "–" : `${r.topCatUA} · ${CATEGORIES[r.topCat].n}. ${CATEGORIES[r.topCat].name}`}
+                          </td>
+                          <td className={cn("px-2 py-1.5", r.nrt && "font-bold text-[#6a3aa0]")}>{r.nrt || "–"}</td>
+                          <td className="px-2 py-1.5" title={r.reason}><StatusChip status={r.band} /></td>
+                          <td className="px-2 py-1.5"><StatusChip status={r.status} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p className="mt-2 text-[11px] text-muted-foreground">{FORMULA_VERSION}</p>
+                </div>
+              </details>
               <div className="flex flex-wrap gap-2">
                 <Button className="shell-caps bg-navy font-bold">Export PO</Button>
                 <Button variant="outline" className="shell-caps font-bold">Open Packets</Button>

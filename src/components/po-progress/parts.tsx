@@ -1,18 +1,20 @@
 import { cn } from "@/lib/utils";
-import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, type PhaseStats, type ProgressPO, type Status, type Week } from "@/lib/po-progress/data";
+import { CURRENT_PHASE, PHASE_LABEL, PHASE_WEEKS, PROGRESS, pct, STATUS_RULE, weekBand, type PhaseStats, type ProgressPO, type Status, type Week } from "@/lib/po-progress/data";
 import { caseSafe } from "@/lib/case-safe";
 
 export function weekClass(x: Week) {
   if (x.kind === "future") return "wk fut";
   if (x.kind === "limbo") return "wk lim";
-  if (x.nrt > 0) return "wk nrt";
-  return `wk u${x.UA === 0 ? 0 : x.UA <= 2 ? 1 : x.UA <= 5 ? 2 : 3}${x.lim > 0 ? " haslim" : ""}`;
+  const b = weekBand(x);
+  if (b.level === 2 && b.reason !== "20+ UA's") return "wk nrt";
+  return `wk u${x.UA === 0 ? 0 : x.UA <= 9 ? 1 : x.UA <= 19 ? 2 : 3}${x.lim > 0 ? " haslim" : ""}`;
 }
 
 export function weekTitle(x: Week) {
   if (x.kind === "future") return `Week ${x.w} · not yet worked`;
   if (x.kind === "limbo") return `Week ${x.w} · limbo`;
-  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UA’s"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${x.late ? " · late packet" : ""}`;
+  const b = weekBand(x);
+  return `Week ${x.w} · ${x.UA} ${x.UA === 1 ? "UA" : "UA’s"}${x.lim ? ` · limbo days ${x.lim}` : ""}${x.nrt ? " · NRT" : ""}${!x.nrt && b.topCatUA >= 3 ? ` · ${b.topCatUA} UA’s in one category` : ""}${x.late ? " · late packet" : ""}`;
 }
 
 export function WeekCell({ x, showNum }: { x: Week; showNum?: boolean }) {
@@ -61,7 +63,20 @@ export function PhaseTiles({ po }: { po: ProgressPO }) {
 }
 
 export function StatusChip({ status }: { status: Status }) {
-  return <span className={cn("chip", status === "STRUGGLING" ? "c-red" : status === "WATCH" ? "c-yel" : "c-grn")}>{status}</span>;
+  return (
+    <span className={cn("chip", status === "BELOW STANDARD" ? "c-red" : status === "EMERGING CONCERN" ? "c-yel" : "c-grn")} title={STATUS_RULE[status]}>
+      {status}
+    </span>
+  );
+}
+
+export function PreviouslyFlaggedChip({ week }: { week: number | null }) {
+  if (week == null) return null;
+  return (
+    <span className="chip c-gry" title={`Flag cleared in Week ${week} after 2 rated weeks that met standard.`}>
+      Previously Flagged <em>wk {week}</em>
+    </span>
+  );
 }
 
 export function VsClassChip({ po }: { po: ProgressPO }) {
@@ -89,10 +104,10 @@ export function TrendLabel({ po }: { po: ProgressPO }) {
 export function Legend() {
   const items: [string, string][] = [
     ["lw u0", "0 UA’s"],
-    ["lw u1", "1-2"],
-    ["lw u2", "3-5"],
-    ["lw u3", "6+"],
-    ["lw nrt", "NRT"],
+    ["lw u1", "1-9"],
+    ["lw u2", "10-19"],
+    ["lw u3", "20+"],
+    ["lw nrt", "NRT or 3+ in One Category"],
     ["lw lim", "Limbo week"],
     ["lw u0 haslim", "Week with limbo days"],
     ["lw fut", "Not yet worked"],
