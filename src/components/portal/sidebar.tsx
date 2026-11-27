@@ -14,6 +14,17 @@ function NavLinks({ role }: { role: Role }) {
   return (
     <nav aria-label="Portal" className="flex flex-col gap-1 px-3">
       {NAV[role].map((item) => {
+        if (item.disabled) {
+          return (
+            <span
+              key={item.href}
+              aria-disabled="true"
+              className="shell-caps cursor-default rounded-md px-3 py-2.5 text-[12px] font-bold text-white/85"
+            >
+              {item.label}
+            </span>
+          );
+        }
         const active = item.href === root ? pathname === root : pathname.startsWith(item.href);
         return (
           <Link
