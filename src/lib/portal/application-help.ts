@@ -41,9 +41,9 @@ const PAGE_NOTE_TOPICS: readonly ApplicationHelpTopic[] = [
     roles: ['fto', 'fto_coordinator', 'fto_sgt', 'po', 'fto_coc'],
     keywords: 'resources library catalog directives geography map cruiser districts law handbook',
     steps: [
-      'A focused catalog of signed-in uploaded files, official division directive PDFs, and the geography map.',
+      'A focused catalog of signed-in reference files, official division directive PDFs, and the geography map.',
       'Catalog results include only the sources listed here.',
-      'Explore the supplied map in an interactive view.',
+      'Explore the geography map in an interactive view.',
     ],
     expectedResult: 'Operational requirements belong to official agency sources.',
     recovery: 'If the embedded map does not load, use “Open Original Map.” Confirm current geography and assignments through official agency sources.',
